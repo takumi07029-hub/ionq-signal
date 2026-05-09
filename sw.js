@@ -1,5 +1,5 @@
 const CACHE = 'ionq-signal-v1';
-const ASSETS = ['/ionq-signal/', '/ionq-signal/index.html', '/ionq-signal/manifest.json', '/ionq-signal/icon.svg'];
+const ASSETS = ['/', '/index.html', '/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
