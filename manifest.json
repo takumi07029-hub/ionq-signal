@@ -1,0 +1,18 @@
+{
+  "name": "IONQ シグナル",
+  "short_name": "IONQシグナル",
+  "description": "IONQの売買シグナルを確認するアプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1117",
+  "theme_color": "#1e2130",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

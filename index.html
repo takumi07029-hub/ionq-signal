@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IONQ シグナル</title>
+<meta name="theme-color" content="#1e2130">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IONQシグナル">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, sans-serif; background: #0f1117; color: #e0e0e0; padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); }
+  h1 { font-size: 18px; text-align: center; margin-bottom: 4px; color: #fff; }
+  .updated { text-align: center; font-size: 12px; color: #888; margin-bottom: 20px; }
+
+  .card { background: #1e2130; border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+  .card-title { font-size: 12px; color: #888; margin-bottom: 6px; }
+
+  .price-big { font-size: 40px; font-weight: bold; text-align: center; color: #fff; }
+  .price-change { text-align: center; font-size: 14px; margin-top: 4px; }
+
+  .signal-box { border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+  .signal-box .label { font-size: 13px; font-weight: bold; margin-bottom: 6px; }
+  .signal-box .target { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
+  .signal-box .status { font-size: 13px; }
+  .signal-box .diff { font-size: 14px; margin-top: 4px; }
+
+  .sell-normal { background: #1e2a1e; border: 1px solid #2d5a2d; }
+  .sell-alert  { background: #3a1a1a; border: 2px solid #ff4444; animation: pulse 1s infinite; }
+  .buy-normal  { background: #1a1e2a; border: 1px solid #2d3d5a; }
+  .buy-alert   { background: #1a2a3a; border: 2px solid #4488ff; animation: pulse 1s infinite; }
+
+  @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.7; } }
+
+  .sell-color { color: #66cc66; }
+  .buy-color  { color: #6699ff; }
+  .alert-sell { color: #ff4444; }
+  .alert-buy  { color: #4488ff; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  td { padding: 5px 4px; border-bottom: 1px solid #2a2d3a; }
+  td:last-child { text-align: right; font-weight: bold; }
+
+  .holdings-row td:first-child { color: #888; font-size: 12px; }
+
+  button { display: block; width: 100%; padding: 14px; border-radius: 10px;
+    background: #2a3a5a; color: #fff; font-size: 15px; border: none;
+    margin-top: 10px; cursor: pointer; }
+  button:active { background: #3a4a6a; }
+
+  .manual { margin-top: 14px; display: none; }
+</style>
+</head>
+<body>
+
+<h1>IONQ シグナル確認</h1>
+<div class="updated" id="updated">読み込み中...</div>
+
+<!-- 現在株価 -->
+<div class="card">
+  <div class="card-title">現在株価</div>
+  <div class="price-big" id="current-price">--</div>
+  <div class="price-change" id="price-change"></div>
+</div>
+
+<!-- 売りシグナル -->
+<div class="signal-box sell-normal" id="sell-box">
+  <div class="label sell-color">売りシグナル（現在ポジション）</div>
+  <div class="target" id="sell-target">目標: $51.91</div>
+  <div class="status" id="sell-status">-</div>
+  <div class="diff" id="sell-diff"></div>
+</div>
+
+<!-- 買いシグナル -->
+<div class="signal-box buy-normal" id="buy-box">
+  <div class="label buy-color">次の買いシグナル</div>
+  <div class="target" id="buy-target">-</div>
+  <div class="status" id="buy-status">-</div>
+  <div class="diff" id="buy-diff"></div>
+</div>
+
+<!-- 保有状況 -->
+<div class="card">
+  <div class="card-title">保有状況</div>
+  <table>
+    <tr class="holdings-row"><td>2025/11/18 14株 @ $46.71</td><td id="h1-pnl">-</td></tr>
+    <tr class="holdings-row"><td>2026/02/02  7株 @ $42.00</td><td id="h2-pnl">-</td></tr>
+    <tr><td style="color:#aaa">合計 21株 / 平均 $45.14</td><td id="total-pnl">-</td></tr>
+  </table>
+</div>
+
+<!-- 直近株価 -->
+<div class="card">
+  <div class="card-title">直近10日間</div>
+  <table id="hist-table"></table>
+</div>
+
+<button onclick="loadData()">更新する</button>
+
+<!-- 手動入力フォールバック -->
+<div class="manual" id="manual-section">
+  <div class="card">
+    <div class="card-title">自動取得失敗 - 手動で入力してください</div>
+    <table style="margin-top:8px">
+      <tr><td style="color:#aaa;font-size:12px">現在株価（楽天証券で確認）</td></tr>
+      <tr><td><input type="number" id="manual-price" placeholder="例: 49.24" step="0.01"
+        style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#0f1117;color:#fff;font-size:20px;text-align:center;margin-top:6px"></td></tr>
+      <tr><td style="color:#aaa;font-size:12px;padding-top:12px">直近20日間の最高値（不明なら空欄→前回値$52.57を使用）</td></tr>
+      <tr><td><input type="number" id="manual-high" placeholder="例: 52.57" step="0.01"
+        style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#0f1117;color:#fff;font-size:20px;text-align:center;margin-top:6px"></td></tr>
+    </table>
+    <button onclick="calcManual()" style="margin-top:12px;background:#3a5a3a">計算する</button>
+  </div>
+</div>
+
+<script>
+const HOLDINGS = [
+  { shares: 14, price: 46.71 },
+  { shares:  7, price: 42.00 },
+];
+const TOTAL_SHARES = HOLDINGS.reduce((s,h) => s + h.shares, 0);
+const AVG_COST     = HOLDINGS.reduce((s,h) => s + h.shares * h.price, 0) / TOTAL_SHARES;
+const SELL_TARGET  = AVG_COST * 1.15;
+const LB = 20;
+
+function rollingMax(closes, n) {
+  return Math.max(...closes.slice(-n));
+}
+
+function calc(closes) {
+  const current    = closes[closes.length - 1];
+  const prevClose  = closes[closes.length - 2];
+  const high20     = rollingMax(closes, LB);
+  const buyTrigger = high20 * 0.85;
+  const sellDiff   = (SELL_TARGET - current) / current * 100;
+  const buyDiff    = (current - buyTrigger) / buyTrigger * 100;
+  const pnl        = (current - AVG_COST) / AVG_COST * 100;
+  const pnlUSD     = (current - AVG_COST) * TOTAL_SHARES;
+  return { current, prevClose, high20, buyTrigger,
+    sellDiff, sellAlert: current >= SELL_TARGET,
+    buyDiff,  buyAlert:  current <= buyTrigger,
+    pnl, pnlUSD };
+}
+
+function renderSignals(closes, dates) {
+  const r = calc(closes);
+
+  document.getElementById('current-price').textContent = '$' + r.current.toFixed(2);
+  const chg = r.current - r.prevClose;
+  const chgEl = document.getElementById('price-change');
+  chgEl.textContent = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '  (' + (chg/r.prevClose*100).toFixed(1) + '%)';
+  chgEl.style.color = chg >= 0 ? '#66cc66' : '#ff6666';
+
+  const sellBox = document.getElementById('sell-box');
+  sellBox.className = 'signal-box ' + (r.sellAlert ? 'sell-alert' : 'sell-normal');
+  document.getElementById('sell-target').innerHTML =
+    '<span class="' + (r.sellAlert ? 'alert-sell' : 'sell-color') + '">目標: $' + SELL_TARGET.toFixed(2) + '</span>';
+  document.getElementById('sell-status').textContent = r.sellAlert
+    ? '★ 売りシグナル発生中！今すぐ売却を検討' : '未発生（保有継続）';
+  document.getElementById('sell-diff').textContent = r.sellAlert
+    ? '現在株価 $' + r.current.toFixed(2) + ' が目標を超過'
+    : 'あと +' + r.sellDiff.toFixed(1) + '% 上昇で発生';
+
+  const buyBox = document.getElementById('buy-box');
+  buyBox.className = 'signal-box ' + (r.buyAlert ? 'buy-alert' : 'buy-normal');
+  document.getElementById('buy-target').innerHTML =
+    '<span class="' + (r.buyAlert ? 'alert-buy' : 'buy-color') + '">発動価格: $' + r.buyTrigger.toFixed(2) + '</span>';
+  document.getElementById('buy-status').textContent = r.buyAlert
+    ? '★ 買いシグナル発生中！追加購入を検討' : '未発生（現金待機）';
+  document.getElementById('buy-diff').textContent = r.buyAlert
+    ? '現在株価 $' + r.current.toFixed(2) + ' が発動価格を下回っています'
+    : '直近' + LB + '日高値 $' + r.high20.toFixed(2) + ' × 0.85  /  あと -' + Math.abs(r.buyDiff).toFixed(1) + '% 下落で発生';
+
+  HOLDINGS.forEach((h, i) => {
+    const p = (r.current - h.price) / h.price * 100;
+    const el = document.getElementById('h' + (i+1) + '-pnl');
+    el.textContent = (p >= 0 ? '+' : '') + p.toFixed(1) + '%';
+    el.style.color = p >= 0 ? '#66cc66' : '#ff6666';
+  });
+  const totalEl = document.getElementById('total-pnl');
+  totalEl.textContent = (r.pnl >= 0 ? '+' : '') + r.pnl.toFixed(1) + '%  (' + (r.pnlUSD >= 0 ? '+' : '') + '$' + r.pnlUSD.toFixed(0) + ')';
+  totalEl.style.color = r.pnl >= 0 ? '#66cc66' : '#ff6666';
+
+  const hist = document.getElementById('hist-table');
+  hist.innerHTML = '';
+  dates.slice(-10).forEach((d, i, arr) => {
+    const c = closes.slice(-10)[i];
+    const isLast = i === arr.length - 1;
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td style="color:' + (isLast?'#fff':'#888') + '">' + d + (isLast?' (最新)':'') + '</td>'
+      + '<td style="color:' + (isLast?'#fff':'#aaa') + '">$' + c.toFixed(2) + '</td>';
+    hist.insertBefore(tr, hist.firstChild);
+  });
+}
+
+async function fetchYahoo() {
+  const end = Math.floor(Date.now() / 1000);
+  const start = end - 60 * 24 * 3600;
+  const yahooUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/IONQ?period1=' + start + '&period2=' + end + '&interval=1d';
+
+  function parseYahoo(j) {
+    const r = j.chart.result[0];
+    const q = r.indicators.quote[0];
+    const dates = r.timestamp.map(t => new Date(t * 1000).toISOString().slice(0, 10));
+    const rows  = q.close.map((c, i) => ({ c, d: dates[i] })).filter(x => x.c != null && !isNaN(x.c));
+    return { closes: rows.map(x => x.c), dates: rows.map(x => x.d) };
+  }
+
+  async function fetchStooq() {
+    const csvUrl = 'https://stooq.com/q/d/l/?s=ionq.us&i=d';
+    const res = await fetch('https://corsproxy.io/?' + encodeURIComponent(csvUrl));
+    if (!res.ok) throw new Error();
+    const text = await res.text();
+    const rows = text.trim().split('\n').slice(1).map(l => {
+      const cols = l.split(',');
+      return { d: cols[0], c: parseFloat(cols[4]) };
+    }).filter(x => !isNaN(x.c)).slice(-60);
+    return { closes: rows.map(x => x.c), dates: rows.map(x => x.d) };
+  }
+
+  const attempts = [
+    () => fetch(yahooUrl, { headers: { Accept: 'application/json' } }).then(r => r.json()).then(parseYahoo),
+    () => fetch('https://corsproxy.io/?' + encodeURIComponent(yahooUrl)).then(r => r.json()).then(parseYahoo),
+    () => fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(yahooUrl)).then(r => r.json()).then(parseYahoo),
+    () => fetchStooq(),
+  ];
+
+  for (const attempt of attempts) {
+    try {
+      const result = await attempt();
+      if (result && result.closes.length > 0) return result;
+    } catch(e) {}
+  }
+  throw new Error('データ取得失敗');
+}
+
+async function loadData() {
+  document.getElementById('updated').textContent = '読み込み中...';
+  document.getElementById('manual-section').style.display = 'none';
+  try {
+    const { closes, dates } = await fetchYahoo();
+    renderSignals(closes, dates);
+    document.getElementById('updated').textContent =
+      '更新: ' + new Date().toLocaleString('ja-JP', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
+  } catch(e) {
+    document.getElementById('updated').textContent = '自動取得失敗';
+    document.getElementById('manual-section').style.display = 'block';
+  }
+}
+
+function calcManual() {
+  const val     = parseFloat(document.getElementById('manual-price').value);
+  const highVal = parseFloat(document.getElementById('manual-high').value);
+  if (isNaN(val) || val <= 0) { alert('現在株価を入力してください'); return; }
+  const high20 = (!isNaN(highVal) && highVal > 0) ? highVal : 52.57;
+  renderSignals(Array(19).fill(high20).concat([val]), Array(20).fill(new Date().toISOString().slice(0,10)));
+  document.getElementById('updated').textContent = '手動入力: $' + val.toFixed(2) + '（20日高値: $' + high20.toFixed(2) + '）';
+}
+
+// Service Worker 登録
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
+loadData();
+</script>
+</body>
+</html>
