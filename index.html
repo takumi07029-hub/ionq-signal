@@ -76,6 +76,22 @@
 
   /* 手動入力フォールバック */
   .manual { display: none; }
+
+  /* 売買履歴 */
+  .history-row { display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 8px 0; border-bottom: 1px solid #2a2d3a; font-size: 12px; }
+  .history-row:last-child { border-bottom: none; }
+  .history-dates { color: #888; line-height: 1.6; }
+  .history-pnl { text-align: right; font-weight: bold; font-size: 14px; }
+  .history-sub { font-size: 11px; color: #888; margin-top: 2px; }
+  .history-total { display: flex; justify-content: space-between; align-items: center;
+    padding-top: 10px; margin-top: 4px; border-top: 2px solid #3a3d4a; font-size: 14px; }
+  .btn-add-trade { background: #1a2a3a; border: 1px solid #4488ff; color: #6699ff;
+    border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 14px; }
+  .del-trade-btn { background: none; border: none; color: #555; font-size: 16px;
+    cursor: pointer; padding: 0 4px; width: auto; margin: 0; line-height: 1; }
+  .del-trade-btn:hover { color: #ff4444; }
+  .no-history { color: #555; text-align: center; font-size: 13px; padding: 8px 0; }
 </style>
 </head>
 <body>
@@ -116,6 +132,15 @@
   <table id="hist-table"></table>
 </div>
 
+<div class="card" style="margin-top:14px">
+  <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+    <span>売買履歴（確定損益）</span>
+    <span id="trade-count" style="color:#555;font-size:11px"></span>
+  </div>
+  <div id="trade-history-list"></div>
+  <button class="btn-add-trade" onclick="openTradeModal()">＋ 売却を記録</button>
+</div>
+
 <button onclick="loadData()">更新する</button>
 
 <div class="manual" id="manual-section">
@@ -130,6 +155,46 @@
         style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#0f1117;color:#fff;font-size:20px;text-align:center;margin-top:6px"></td></tr>
     </table>
     <button onclick="calcManual()" style="margin-top:12px;background:#3a5a3a">計算する</button>
+  </div>
+</div>
+
+<!-- 売却記録モーダル -->
+<div class="modal-overlay" id="trade-modal">
+  <div class="modal">
+    <h2>売却を記録</h2>
+    <p style="font-size:12px;color:#888;margin-bottom:14px">
+      1回の売買（買い→売り）を記録します。<br>
+      損益 = (売り単価 − 買い単価) × 株数
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <div>
+        <div class="modal-label">購入日</div>
+        <input type="date" id="t-buy-date" style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#0f1117;color:#fff;font-size:14px">
+      </div>
+      <div>
+        <div class="modal-label">売却日</div>
+        <input type="date" id="t-sell-date" style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#0f1117;color:#fff;font-size:14px">
+      </div>
+      <div>
+        <div class="modal-label">購入単価 ($)</div>
+        <input type="number" id="t-buy-price" placeholder="例: 42.00" step="0.01" style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#0f1117;color:#fff;font-size:14px;text-align:center">
+      </div>
+      <div>
+        <div class="modal-label">売却単価 ($)</div>
+        <input type="number" id="t-sell-price" placeholder="例: 51.91" step="0.01" style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#0f1117;color:#fff;font-size:14px;text-align:center">
+      </div>
+      <div>
+        <div class="modal-label">株数</div>
+        <input type="number" id="t-shares" placeholder="例: 21" step="1" min="1" style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#0f1117;color:#fff;font-size:14px;text-align:center">
+      </div>
+      <div>
+        <div class="modal-label">メモ（任意）</div>
+        <input type="text" id="t-memo" placeholder="例: 第11トレード" style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#0f1117;color:#fff;font-size:14px">
+      </div>
+    </div>
+    <div id="trade-preview" style="background:#0f1117;border-radius:8px;padding:12px;font-size:13px;min-height:40px;margin-bottom:4px"></div>
+    <button class="btn-save" onclick="saveTrade()">記録する</button>
+    <button class="btn-cancel" onclick="closeTradeModal()">キャンセル</button>
   </div>
 </div>
 
@@ -372,11 +437,136 @@ function saveHoldings() {
   loadData();
 }
 
+// ── 売買履歴 ──
+var TRADE_KEY = 'ionq_trade_history';
+
+function loadTrades() {
+  try {
+    var s = localStorage.getItem(TRADE_KEY);
+    if (s) return JSON.parse(s);
+  } catch(e) {}
+  return [];
+}
+
+function saveTradesData(trades) {
+  try { localStorage.setItem(TRADE_KEY, JSON.stringify(trades)); } catch(e) {}
+}
+
+function renderTradeHistory() {
+  var trades = loadTrades();
+  var list = document.getElementById('trade-history-list');
+  var countEl = document.getElementById('trade-count');
+  list.innerHTML = '';
+
+  if (trades.length === 0) {
+    list.innerHTML = '<div class="no-history">記録なし</div>';
+    countEl.textContent = '';
+    return;
+  }
+
+  var totalPnlUSD = 0;
+  trades.forEach(function(t, i) {
+    var pnlUSD = (t.sellPrice - t.buyPrice) * t.shares;
+    var pnlPct = (t.sellPrice - t.buyPrice) / t.buyPrice * 100;
+    totalPnlUSD += pnlUSD;
+    var isPos = pnlUSD >= 0;
+    var color = isPos ? '#66cc66' : '#ff6666';
+
+    var row = document.createElement('div');
+    row.className = 'history-row';
+    row.innerHTML =
+      '<div class="history-dates">'
+      + '<span style="color:#aaa">' + (t.memo || ('取引' + (i+1))) + '</span><br>'
+      + '買: ' + t.buyDate + '  $' + parseFloat(t.buyPrice).toFixed(2) + '<br>'
+      + '売: ' + t.sellDate + '  $' + parseFloat(t.sellPrice).toFixed(2) + '  ' + t.shares + '株'
+      + '</div>'
+      + '<div style="text-align:right">'
+      + '<div class="history-pnl" style="color:' + color + '">'
+      + (isPos ? '+' : '') + '$' + pnlUSD.toFixed(2) + '</div>'
+      + '<div class="history-sub" style="color:' + color + '">'
+      + (isPos ? '+' : '') + pnlPct.toFixed(1) + '%</div>'
+      + '<button class="del-trade-btn" onclick="deleteTrade(' + i + ')" title="削除">✕</button>'
+      + '</div>';
+    list.appendChild(row);
+  });
+
+  var totalColor = totalPnlUSD >= 0 ? '#66cc66' : '#ff6666';
+  var totalDiv = document.createElement('div');
+  totalDiv.className = 'history-total';
+  totalDiv.innerHTML =
+    '<span style="color:#aaa">累計実質損益</span>'
+    + '<span style="color:' + totalColor + ';font-weight:bold;font-size:16px">'
+    + (totalPnlUSD >= 0 ? '+' : '') + '$' + totalPnlUSD.toFixed(2) + '</span>';
+  list.appendChild(totalDiv);
+
+  countEl.textContent = trades.length + '件';
+}
+
+function deleteTrade(idx) {
+  if (!confirm('この記録を削除しますか？')) return;
+  var trades = loadTrades();
+  trades.splice(idx, 1);
+  saveTradesData(trades);
+  renderTradeHistory();
+}
+
+function openTradeModal(idx) {
+  var inputs = ['t-buy-date','t-sell-date','t-buy-price','t-sell-price','t-shares','t-memo'];
+  inputs.forEach(function(id) { document.getElementById(id).value = ''; });
+  document.getElementById('trade-preview').textContent = '';
+  // リアルタイムプレビュー
+  ['t-buy-price','t-sell-price','t-shares'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', updateTradePreview);
+  });
+  document.getElementById('trade-modal').classList.add('open');
+}
+
+function updateTradePreview() {
+  var bp = parseFloat(document.getElementById('t-buy-price').value);
+  var sp = parseFloat(document.getElementById('t-sell-price').value);
+  var sh = parseFloat(document.getElementById('t-shares').value);
+  var prev = document.getElementById('trade-preview');
+  if (isNaN(bp) || isNaN(sp) || isNaN(sh) || sh <= 0) {
+    prev.textContent = ''; return;
+  }
+  var pnlUSD = (sp - bp) * sh;
+  var pnlPct = (sp - bp) / bp * 100;
+  var isPos = pnlUSD >= 0;
+  prev.innerHTML = '損益: <span style="color:' + (isPos ? '#66cc66' : '#ff6666') + ';font-weight:bold">'
+    + (isPos ? '+' : '') + '$' + pnlUSD.toFixed(2)
+    + '  (' + (isPos ? '+' : '') + pnlPct.toFixed(1) + '%)</span>';
+}
+
+function closeTradeModal() {
+  document.getElementById('trade-modal').classList.remove('open');
+}
+
+function saveTrade() {
+  var buyDate   = document.getElementById('t-buy-date').value;
+  var sellDate  = document.getElementById('t-sell-date').value;
+  var buyPrice  = parseFloat(document.getElementById('t-buy-price').value);
+  var sellPrice = parseFloat(document.getElementById('t-sell-price').value);
+  var shares    = parseFloat(document.getElementById('t-shares').value);
+  var memo      = document.getElementById('t-memo').value.trim();
+
+  if (!buyDate || !sellDate || isNaN(buyPrice) || isNaN(sellPrice) || isNaN(shares) || shares <= 0) {
+    alert('メモ以外の全項目を入力してください'); return;
+  }
+  var trades = loadTrades();
+  trades.push({ buyDate: buyDate, sellDate: sellDate, buyPrice: buyPrice, sellPrice: sellPrice, shares: shares, memo: memo });
+  // 売却日順に並び替え
+  trades.sort(function(a, b) { return a.sellDate < b.sellDate ? -1 : 1; });
+  saveTradesData(trades);
+  closeTradeModal();
+  renderTradeHistory();
+}
+
 // Service Worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
 
+renderTradeHistory();
 loadData();
 </script>
 </body>
