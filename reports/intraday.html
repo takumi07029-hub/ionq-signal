@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IONQ 日中高値売り（指値）分析レポート</title>
+<style>
+  :root {
+    --bg: #0f1117; --card: #1a1d2e; --border: #2a2d3a;
+    --pos: #4ade80; --neg: #f87171; --neutral: #94a3b8;
+    --accent: #60a5fa; --warn: #fbbf24; --best: #a78bfa;
+    --text: #e2e8f0; --sub: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system,'Segoe UI',sans-serif; font-size: 14px; line-height: 1.6; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 22px; color: #fff; margin-bottom: 4px; }
+  .meta { color: var(--sub); font-size: 12px; margin-bottom: 28px; }
+  h2 { font-size: 16px; color: var(--accent); margin: 32px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 14px; color: var(--neutral); margin: 20px 0 8px; }
+  .insight { background: #1e2a1e; border-left: 3px solid var(--pos); border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; line-height: 1.8; }
+  .warn-box { background: #2a1e1e; border-left: 3px solid var(--neg); border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; line-height: 1.8; }
+  .info-box { background: #1a2238; border-left: 3px solid var(--accent); border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; line-height: 1.8; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .compare-card { background: var(--card); border-radius: 10px; padding: 16px; }
+  .compare-card.card-a { border-top: 3px solid var(--accent); }
+  .compare-card.card-b { border-top: 3px solid var(--warn); }
+  .compare-card h3 { margin-top: 0; color: #fff; font-size: 14px; }
+  .compare-card .ret { font-size: 32px; font-weight: bold; margin: 8px 0 4px; }
+  .compare-card .ret.pos { color: var(--pos); }
+  .compare-card .ret.neg { color: var(--neg); }
+  .compare-card .detail { font-size: 12px; color: var(--neutral); line-height: 2; }
+  .table-wrap { overflow-x: auto; margin-bottom: 20px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th { background: #1e2238; color: var(--neutral); padding: 8px 10px; text-align: center; border: 1px solid var(--border); font-weight: 600; white-space: nowrap; }
+  td { padding: 7px 10px; border: 1px solid var(--border); text-align: center; }
+  tr:hover td { background: rgba(255,255,255,0.03); }
+  .pos { color: var(--pos); font-weight: 600; }
+  .neg { color: var(--neg); font-weight: 600; }
+  .na  { color: var(--sub); }
+  .pos-cell { background: rgba(74,222,128,0.06); color: var(--pos); font-weight: 600; }
+  .neg-cell { background: rgba(248,113,113,0.06); color: var(--neg); }
+  .best-cell { background: rgba(167,139,250,0.15); color: var(--best); font-weight: bold; border: 1px solid var(--best) !important; }
+  .sub { font-size: 10px; color: var(--sub); display: block; }
+  .changed { background: rgba(251,191,36,0.05); }
+  .changed-cell { color: var(--warn); font-weight: 600; }
+  .row-win { background: rgba(74,222,128,0.03); }
+  .row-lose { background: rgba(248,113,113,0.03); }
+  .open-pos td { background: rgba(96,165,250,0.06); }
+  .open-pos em { color: var(--accent); font-style: normal; font-weight: bold; }
+  .tag { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 4px; }
+  .tag-a { background: rgba(96,165,250,0.2); color: var(--accent); }
+  .tag-b { background: rgba(251,191,36,0.2); color: var(--warn); }
+  .tag-other { background: rgba(148,163,184,0.2); color: var(--neutral); }
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--sub); margin-bottom: 8px; flex-wrap: wrap; }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .dot-a { background: var(--accent); }
+  .dot-b { background: var(--warn); }
+  @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>IONQ 日中高値売り（指値）分析レポート</h1>
+<div class="meta">作成日時: 2026/5/30 20:18:54 ／ 分析期間: 2023-05-31 ～ 2026-05-29（752営業日）</div>
+
+<!-- ── 0. 分析概要 ── -->
+<h2>0. 分析の背景と目的</h2>
+<div class="info-box">
+  <strong>課題認識：</strong> これまでのバックテストは「終値が売り目標に達した日の終値で売却」を前提としていた。
+  しかし実際の運用では楽天証券に<strong>指値注文（$51.91）</strong>を事前に入れておくため、
+  日中に目標価格に達した時点で約定する。この差がパフォーマンスにどう影響するかを検証する。<br><br>
+  <strong>前提条件：</strong><br>
+  ・買い：従来通り（終値ベース・翌日注文）<br>
+  ・売り方式A（終値）：終値が目標以上の日に終値で売却 ← 従来のバックテスト<br>
+  ・売り方式B（指値）：日中高値が目標に達した日に目標価格ちょうどで売却 ← 実際の運用に近い
+</div>
+
+<!-- ── 1. 旧vs新 直接比較 ── -->
+<h2>1. 売り方式 直接比較（下落率戦略 -15%/+15%, lb=20）</h2>
+
+<div class="compare-grid">
+  <div class="compare-card card-a">
+    <h3>方式A：終値売り（従来バックテスト）</h3>
+    <div class="ret pos">+636.1%</div>
+    <div class="detail">
+      年率：+95.2%<br>
+      勝率：100%<br>
+      取引数：10回<br>
+      平均保有：61日<br>
+      最大損失：+9.9%<br>
+      最大利益：+40.2%
+    </div>
+  </div>
+  <div class="compare-card card-b">
+    <h3>方式B：指値売り（実際の運用に近い）</h3>
+    <div class="ret pos">+286.5%</div>
+    <div class="detail">
+      年率：+57.3%<br>
+      勝率：100%<br>
+      取引数：10回<br>
+      平均保有：60日<br>
+      最大損失：+9.9%<br>
+      最大利益：+15.0%
+    </div>
+  </div>
+</div>
+
+<div class="warn-box">
+  <strong>重要な発見：指値売り（方式B）は終値売り（方式A）より大幅に劣る</strong><br>
+  方式A +636.1% vs 方式B +286.5%（差：-349.5%）<br>
+  原因：IONQは一度上昇し始めると終値が目標価格を大きく超えるケースが多い。
+  方式Aはこの「超過分」を取り込めるが、方式Bは目標価格ちょうどで頭打ちになる。<br>
+  例）2024年12月：方式A $41.81 vs 方式B $34.30（同じ買い値$29.83から）
+</div>
+
+<h3>トレードごとの差異</h3>
+<div class="legend">
+  <span><span class="dot dot-a"></span> 方式A（終値）</span>
+  <span><span class="dot dot-b"></span> 方式B（指値）</span>
+  <span style="color:var(--warn)">黄色行：売却日・価格に差異あり</span>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr>
+  <th>No.</th><th>買い日</th><th>買値</th>
+  <th>A売り日</th><th>A売値</th><th>A損益</th>
+  <th>B売り日</th><th>B売値</th><th>B損益</th>
+  <th>差異</th><th>B-A損益差</th>
+</tr></thead>
+<tbody><tr class="changed">
+            <td>1</td>
+            <td>2023-08-07</td><td>$15.58</td>
+            <td>2023-09-05</td><td>$18.97</td><td>+21.8%</td>
+            <td>2023-09-05</td><td>$17.92</td><td>+15.0%</td>
+            <td class="changed-cell">同日/価格差</td>
+            <td class="neg">-6.8%</td>
+        </tr><tr class="changed">
+            <td>2</td>
+            <td>2023-09-18</td><td>$16.16</td>
+            <td>2024-11-07</td><td>$22.11</td><td>+36.8%</td>
+            <td>2024-11-07</td><td>$18.58</td><td>+15.0%</td>
+            <td class="changed-cell">同日/価格差</td>
+            <td class="neg">-21.8%</td>
+        </tr><tr class="changed">
+            <td>3</td>
+            <td>2024-12-11</td><td>$29.83</td>
+            <td>2024-12-16</td><td>$41.81</td><td>+40.2%</td>
+            <td>2024-12-16</td><td>$34.30</td><td>+15.0%</td>
+            <td class="changed-cell">同日/価格差</td>
+            <td class="neg">-25.2%</td>
+        </tr><tr class="changed">
+            <td>4</td>
+            <td>2025-01-08</td><td>$30.25</td>
+            <td>2025-01-15</td><td>$39.39</td><td>+30.2%</td>
+            <td>2025-01-15</td><td>$34.79</td><td>+15.0%</td>
+            <td class="changed-cell">同日/価格差</td>
+            <td class="neg">-15.2%</td>
+        </tr><tr class="changed">
+            <td>5</td>
+            <td>2025-01-16</td><td>$41.55</td>
+            <td>2025-05-27</td><td>$48.04</td><td>+15.6%</td>
+            <td>2025-05-22</td><td>$47.78</td><td>+15.0%</td>
+            <td class="changed-cell">5日早い</td>
+            <td class="neg">-0.6%</td>
+        </tr><tr class="changed">
+            <td>6</td>
+            <td>2025-05-30</td><td>$40.34</td>
+            <td>2025-07-18</td><td>$46.51</td><td>+15.3%</td>
+            <td>2025-07-07</td><td>$46.39</td><td>+15.0%</td>
+            <td class="changed-cell">11日早い</td>
+            <td class="neg">-0.3%</td>
+        </tr><tr class="changed">
+            <td>7</td>
+            <td>2025-08-01</td><td>$38.12</td>
+            <td>2025-08-11</td><td>$44.94</td><td>+17.9%</td>
+            <td>2025-08-11</td><td>$43.84</td><td>+15.0%</td>
+            <td class="changed-cell">同日/価格差</td>
+            <td class="neg">-2.9%</td>
+        </tr><tr class="changed">
+            <td>8</td>
+            <td>2025-08-19</td><td>$36.80</td>
+            <td>2025-08-28</td><td>$43.30</td><td>+17.7%</td>
+            <td>2025-08-27</td><td>$42.32</td><td>+15.0%</td>
+            <td class="changed-cell">1日早い</td>
+            <td class="neg">-2.7%</td>
+        </tr><tr class="changed">
+            <td>9</td>
+            <td>2025-09-30</td><td>$61.50</td>
+            <td>2025-10-03</td><td>$73.28</td><td>+19.2%</td>
+            <td>2025-10-03</td><td>$70.72</td><td>+15.0%</td>
+            <td class="changed-cell">同日/価格差</td>
+            <td class="neg">-4.2%</td>
+        </tr><tr class="">
+            <td>10</td>
+            <td>2025-10-16</td><td>$65.59</td>
+            <td><em>保有中</em></td><td>-</td><td>+9.9%</td>
+            <td><em>保有中</em></td><td>-</td><td>+9.9%</td>
+            <td class="">変化なし</td>
+            <td class="pos">−</td>
+        </tr></tbody>
+</table>
+</div>
+
+<!-- ── 2. パラメータマトリクス ── -->
+<h2>2. 下落率戦略 パラメータマトリクス（lb=20）</h2>
+<p style="font-size:12px;color:var(--sub);margin-bottom:12px">値: 総収益率（複利）/ 取引数/平均保有日数　★は各方式の最高値</p>
+
+<h3>方式A：終値売り（従来）</h3><div class="table-wrap"><table><thead><tr><th>買い↓/売り→</th><th>+10%</th><th>+15%</th><th>+20%</th><th>+25%</th><th>+30%</th></tr></thead><tbody><tr><th>-10%</th><td class="pos-cell">+760.8%<br><span class="sub">14回/46日</span></td><td class="best-cell">+845.5%<br><span class="sub">12回/55日</span></td><td class="pos-cell">+617.1%<br><span class="sub">9回/75日</span></td><td class="pos-cell">+295.2%<br><span class="sub">6回/113日</span></td><td class="pos-cell">+583.8%<br><span class="sub">7回/98日</span></td></tr><tr><th>-15%</th><td class="pos-cell">+390.2%<br><span class="sub">11回/53日</span></td><td class="pos-cell">+636.1%<br><span class="sub">10回/61日</span></td><td class="pos-cell">+474.3%<br><span class="sub">7回/91日</span></td><td class="pos-cell">+492.8%<br><span class="sub">7回/91日</span></td><td class="pos-cell">+408.4%<br><span class="sub">6回/109日</span></td></tr><tr><th>-20%</th><td class="pos-cell">+195.6%<br><span class="sub">8回/69日</span></td><td class="pos-cell">+372.9%<br><span class="sub">8回/70日</span></td><td class="pos-cell">+343.1%<br><span class="sub">7回/81日</span></td><td class="pos-cell">+438.4%<br><span class="sub">6回/105日</span></td><td class="pos-cell">+306.9%<br><span class="sub">5回/128日</span></td></tr><tr><th>-25%</th><td class="pos-cell">+335.6%<br><span class="sub">9回/50日</span></td><td class="pos-cell">+301.4%<br><span class="sub">7回/65日</span></td><td class="pos-cell">+220.0%<br><span class="sub">5回/103日</span></td><td class="pos-cell">+246.6%<br><span class="sub">5回/103日</span></td><td class="pos-cell">+264.0%<br><span class="sub">5回/103日</span></td></tr><tr><th>-30%</th><td class="pos-cell">+188.6%<br><span class="sub">7回/30日</span></td><td class="pos-cell">+185.6%<br><span class="sub">6回/38日</span></td><td class="pos-cell">+208.9%<br><span class="sub">5回/97日</span></td><td class="pos-cell">+230.0%<br><span class="sub">5回/98日</span></td><td class="pos-cell">+307.6%<br><span class="sub">5回/99日</span></td></tr></tbody></table></div>
+<h3>方式B：指値売り（日中高値）</h3><div class="table-wrap"><table><thead><tr><th>買い↓/売り→</th><th>+10%</th><th>+15%</th><th>+20%</th><th>+25%</th><th>+30%</th></tr></thead><tbody><tr><th>-10%</th><td class="pos-cell">+357.3%<br><span class="sub">17回/37日</span></td><td class="best-cell">+512.4%<br><span class="sub">14回/47日</span></td><td class="pos-cell">+426.3%<br><span class="sub">10回/67日</span></td><td class="pos-cell">+493.2%<br><span class="sub">9回/75日</span></td><td class="pos-cell">+417.0%<br><span class="sub">7回/97日</span></td></tr><tr><th>-15%</th><td class="pos-cell">+317.7%<br><span class="sub">15回/39日</span></td><td class="pos-cell">+286.5%<br><span class="sub">10回/60日</span></td><td class="pos-cell">+228.1%<br><span class="sub">7回/91日</span></td><td class="pos-cell">+319.2%<br><span class="sub">7回/91日</span></td><td class="pos-cell">+430.4%<br><span class="sub">7回/92日</span></td></tr><tr><th>-20%</th><td class="pos-cell">+317.7%<br><span class="sub">15回/34日</span></td><td class="pos-cell">+236.1%<br><span class="sub">9回/61日</span></td><td class="pos-cell">+293.7%<br><span class="sub">8回/70日</span></td><td class="pos-cell">+319.2%<br><span class="sub">7回/82日</span></td><td class="pos-cell">+308.0%<br><span class="sub">6回/106日</span></td></tr><tr><th>-25%</th><td class="pos-cell">+359.5%<br><span class="sub">16回/16日</span></td><td class="pos-cell">+251.8%<br><span class="sub">9回/50日</span></td><td class="pos-cell">+330.0%<br><span class="sub">8回/58日</span></td><td class="pos-cell">+193.5%<br><span class="sub">5回/103日</span></td><td class="pos-cell">+243.4%<br><span class="sub">5回/103日</span></td></tr><tr><th>-30%</th><td class="pos-cell">+185.3%<br><span class="sub">11回/6日</span></td><td class="pos-cell">+166.0%<br><span class="sub">7回/30日</span></td><td class="pos-cell">+198.6%<br><span class="sub">6回/38日</span></td><td class="pos-cell">+205.2%<br><span class="sub">5回/96日</span></td><td class="pos-cell">+271.3%<br><span class="sub">5回/99日</span></td></tr></tbody></table></div>
+
+<!-- ── 3. 全戦略サマリ ── -->
+<h2>3. 全戦略サマリ（新旧比較）</h2>
+<div class="table-wrap">
+<table>
+<thead><tr>
+  <th>戦略</th><th>総収益率</th><th>年率</th><th>勝率</th><th>取引数</th><th>平均保有</th><th>最大損失</th><th>最大利益</th>
+</tr></thead>
+<tbody>
+<tr>
+            <td>下落率A -15/+15（終値売り） <span class="tag tag-a">A</span></td>
+            <td class="pos">+636.1%</td>
+            <td class="pos">+95.2%</td>
+            <td>100%</td>
+            <td>10回</td>
+            <td>61日</td>
+            <td class="pos">+9.9%</td>
+            <td class="pos">+40.2%</td>
+        </tr><tr>
+            <td>下落率B -15/+15（指値売り） <span class="tag tag-b">B</span></td>
+            <td class="pos">+286.5%</td>
+            <td class="pos">+57.3%</td>
+            <td>100%</td>
+            <td>10回</td>
+            <td>60日</td>
+            <td class="pos">+9.9%</td>
+            <td class="pos">+15.0%</td>
+        </tr><tr>
+            <td>下落率A -10/+15（終値売り） <span class="tag tag-a">A</span></td>
+            <td class="pos">+845.5%</td>
+            <td class="pos">+112.3%</td>
+            <td>100%</td>
+            <td>12回</td>
+            <td>55日</td>
+            <td class="neg">-0.5%</td>
+            <td class="pos">+30.2%</td>
+        </tr><tr>
+            <td>下落率B -10/+15（指値売り） <span class="tag tag-b">B</span></td>
+            <td class="pos">+512.4%</td>
+            <td class="pos">+83.5%</td>
+            <td>100%</td>
+            <td>14回</td>
+            <td>47日</td>
+            <td class="neg">-0.5%</td>
+            <td class="pos">+15.0%</td>
+        </tr><tr>
+            <td>RSI (30/70)  終値売り <span class="tag tag-other">-</span></td>
+            <td class="pos">+143.9%</td>
+            <td class="pos">+34.8%</td>
+            <td>67%</td>
+            <td>3回</td>
+            <td>113日</td>
+            <td class="neg">-6.6%</td>
+            <td class="pos">+83.8%</td>
+        </tr><tr>
+            <td>MA クロス (5/20) <span class="tag tag-other">-</span></td>
+            <td class="pos">+298.6%</td>
+            <td class="pos">+58.9%</td>
+            <td>26%</td>
+            <td>20回</td>
+            <td>18日</td>
+            <td class="neg">-15.2%</td>
+            <td class="pos">+256.3%</td>
+        </tr><tr>
+            <td>MA クロス (10/50) <span class="tag tag-other">-</span></td>
+            <td class="pos">+593.2%</td>
+            <td class="pos">+91.3%</td>
+            <td>38%</td>
+            <td>9回</td>
+            <td>32日</td>
+            <td class="neg">-23.2%</td>
+            <td class="pos">+312.9%</td>
+        </tr><tr>
+            <td>BB (20,2.0)  終値売り <span class="tag tag-a">A</span></td>
+            <td class="neg">-22.2%</td>
+            <td class="neg">-8.1%</td>
+            <td>50%</td>
+            <td>6回</td>
+            <td>54日</td>
+            <td class="neg">-29.5%</td>
+            <td class="pos">+18.0%</td>
+        </tr><tr>
+            <td>BB (20,2.0)  指値売り <span class="tag tag-b">B</span></td>
+            <td class="pos">+118.1%</td>
+            <td class="pos">+29.9%</td>
+            <td>70%</td>
+            <td>10回</td>
+            <td>24日</td>
+            <td class="neg">-20.3%</td>
+            <td class="pos">+26.9%</td>
+        </tr>
+<tr style="border-top:2px solid var(--border)">
+  <td style="text-align:left;color:var(--neutral)">買持ち(BH)</td>
+  <td class="pos">+567.9%</td>
+  <td colspan="6" style="color:var(--sub)">－</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- ── 4. ローリング開始日分析 ── -->
+<h2>4. ローリング開始日分析（-15%/+15%, lb=20）</h2>
+<p style="font-size:12px;color:var(--sub);margin-bottom:12px">
+  開始月ごとに「その月から現在まで」の収益率を計算。緑行=方式AがBHを上回った開始月。
+</p>
+<div class="table-wrap">
+<table>
+<thead><tr>
+  <th>開始月</th><th>開始株価</th><th>買持ち(BH)</th>
+  <th>方式A リターン</th><th>方式A BH比</th>
+  <th>方式B リターン</th><th>方式B BH比</th>
+  <th>B-A差</th>
+</tr></thead>
+<tbody><tr class="row-win">
+            <td>2023-04</td>
+            <td>$10.79</td>
+            <td class="pos">+567.9%</td>
+            <td class="">+636.1%</td>
+            <td class="pos">+68.1%</td>
+            <td class="">+286.5%</td>
+            <td class="neg">-281.4%</td>
+            <td class="neg">-349.5%</td>
+        </tr><tr class="row-win">
+            <td>2023-05</td>
+            <td>$10.79</td>
+            <td class="pos">+567.9%</td>
+            <td class="">+636.1%</td>
+            <td class="pos">+68.1%</td>
+            <td class="">+286.5%</td>
+            <td class="neg">-281.4%</td>
+            <td class="neg">-349.5%</td>
+        </tr><tr class="row-win">
+            <td>2023-06</td>
+            <td>$10.72</td>
+            <td class="pos">+572.3%</td>
+            <td class="">+636.1%</td>
+            <td class="pos">+63.8%</td>
+            <td class="">+286.5%</td>
+            <td class="neg">-285.8%</td>
+            <td class="neg">-349.5%</td>
+        </tr><tr class="row-win">
+            <td>2023-07</td>
+            <td>$13.50</td>
+            <td class="pos">+433.9%</td>
+            <td class="">+636.1%</td>
+            <td class="pos">+202.2%</td>
+            <td class="">+286.5%</td>
+            <td class="neg">-147.3%</td>
+            <td class="neg">-349.5%</td>
+        </tr><tr class="row-win">
+            <td>2023-08</td>
+            <td>$19.86</td>
+            <td class="pos">+262.9%</td>
+            <td class="">+651.0%</td>
+            <td class="pos">+388.1%</td>
+            <td class="">+286.5%</td>
+            <td class="pos">+23.7%</td>
+            <td class="neg">-364.5%</td>
+        </tr><tr class="row-win">
+            <td>2023-09</td>
+            <td>$17.51</td>
+            <td class="pos">+311.6%</td>
+            <td class="">+678.0%</td>
+            <td class="pos">+366.4%</td>
+            <td class="">+286.5%</td>
+            <td class="neg">-25.1%</td>
+            <td class="neg">-391.4%</td>
+        </tr><tr class="row-win">
+            <td>2023-10</td>
+            <td>$14.81</td>
+            <td class="pos">+386.6%</td>
+            <td class="">+869.0%</td>
+            <td class="pos">+482.4%</td>
+            <td class="">+411.2%</td>
+            <td class="pos">+24.6%</td>
+            <td class="neg">-457.8%</td>
+        </tr><tr class="row-win">
+            <td>2023-11</td>
+            <td>$10.22</td>
+            <td class="pos">+605.2%</td>
+            <td class="">+674.3%</td>
+            <td class="pos">+69.1%</td>
+            <td class="">+286.5%</td>
+            <td class="neg">-318.6%</td>
+            <td class="neg">-387.8%</td>
+        </tr><tr class="row-win">
+            <td>2023-12</td>
+            <td>$13.61</td>
+            <td class="pos">+429.5%</td>
+            <td class="">+674.3%</td>
+            <td class="pos">+244.8%</td>
+            <td class="">+286.5%</td>
+            <td class="neg">-143.0%</td>
+            <td class="neg">-387.8%</td>
+        </tr><tr class="row-win">
+            <td>2024-01</td>
+            <td>$12.16</td>
+            <td class="pos">+492.7%</td>
+            <td class="">+647.9%</td>
+            <td class="pos">+155.2%</td>
+            <td class="">+344.5%</td>
+            <td class="neg">-148.2%</td>
+            <td class="neg">-303.4%</td>
+        </tr><tr class="row-win">
+            <td>2024-02</td>
+            <td>$10.24</td>
+            <td class="pos">+603.8%</td>
+            <td class="">+850.0%</td>
+            <td class="pos">+246.2%</td>
+            <td class="">+344.5%</td>
+            <td class="neg">-259.3%</td>
+            <td class="neg">-505.5%</td>
+        </tr><tr class="row-win">
+            <td>2024-03</td>
+            <td>$10.66</td>
+            <td class="pos">+576.1%</td>
+            <td class="">+659.7%</td>
+            <td class="pos">+83.7%</td>
+            <td class="">+286.5%</td>
+            <td class="neg">-289.5%</td>
+            <td class="neg">-373.2%</td>
+        </tr><tr class="row-win">
+            <td>2024-04</td>
+            <td>$9.99</td>
+            <td class="pos">+621.4%</td>
+            <td class="">+1042.3%</td>
+            <td class="pos">+420.8%</td>
+            <td class="">+411.2%</td>
+            <td class="neg">-210.2%</td>
+            <td class="neg">-631.1%</td>
+        </tr><tr class="row-win">
+            <td>2024-05</td>
+            <td>$8.75</td>
+            <td class="pos">+723.7%</td>
+            <td class="">+1042.3%</td>
+            <td class="pos">+318.6%</td>
+            <td class="">+411.2%</td>
+            <td class="neg">-312.5%</td>
+            <td class="neg">-631.1%</td>
+        </tr><tr class="row-win">
+            <td>2024-06</td>
+            <td>$7.78</td>
+            <td class="pos">+826.3%</td>
+            <td class="">+1051.2%</td>
+            <td class="pos">+224.8%</td>
+            <td class="">+411.2%</td>
+            <td class="neg">-415.1%</td>
+            <td class="neg">-640.0%</td>
+        </tr><tr class="row-lose">
+            <td>2024-07</td>
+            <td>$6.84</td>
+            <td class="pos">+953.7%</td>
+            <td class="">+881.0%</td>
+            <td class="neg">-72.6%</td>
+            <td class="">+344.5%</td>
+            <td class="neg">-609.1%</td>
+            <td class="neg">-536.5%</td>
+        </tr><tr class="row-lose">
+            <td>2024-08</td>
+            <td>$7.52</td>
+            <td class="pos">+858.4%</td>
+            <td class="">+659.8%</td>
+            <td class="neg">-198.6%</td>
+            <td class="">+286.5%</td>
+            <td class="neg">-571.8%</td>
+            <td class="neg">-373.2%</td>
+        </tr><tr class="row-lose">
+            <td>2024-09</td>
+            <td>$6.96</td>
+            <td class="pos">+935.5%</td>
+            <td class="">+659.8%</td>
+            <td class="neg">-275.7%</td>
+            <td class="">+286.5%</td>
+            <td class="neg">-648.9%</td>
+            <td class="neg">-373.2%</td>
+        </tr><tr class="row-lose">
+            <td>2024-10</td>
+            <td>$8.17</td>
+            <td class="pos">+782.1%</td>
+            <td class="">+550.0%</td>
+            <td class="neg">-232.1%</td>
+            <td class="">+236.1%</td>
+            <td class="neg">-546.0%</td>
+            <td class="neg">-313.9%</td>
+        </tr><tr class="row-lose">
+            <td>2024-11</td>
+            <td>$14.85</td>
+            <td class="pos">+385.3%</td>
+            <td class="">+341.9%</td>
+            <td class="neg">-43.5%</td>
+            <td class="">+192.3%</td>
+            <td class="neg">-193.0%</td>
+            <td class="neg">-149.6%</td>
+        </tr><tr class="row-win">
+            <td>2024-12</td>
+            <td>$32.06</td>
+            <td class="pos">+124.8%</td>
+            <td class="">+215.2%</td>
+            <td class="pos">+90.4%</td>
+            <td class="">+154.2%</td>
+            <td class="pos">+29.4%</td>
+            <td class="neg">-61.1%</td>
+        </tr><tr class="row-win">
+            <td>2025-01</td>
+            <td>$43.10</td>
+            <td class="pos">+67.2%</td>
+            <td class="">+142.8%</td>
+            <td class="pos">+75.6%</td>
+            <td class="">+121.0%</td>
+            <td class="pos">+53.8%</td>
+            <td class="neg">-21.8%</td>
+        </tr><tr class="row-win">
+            <td>2025-02</td>
+            <td>$41.47</td>
+            <td class="pos">+73.8%</td>
+            <td class="">+142.8%</td>
+            <td class="pos">+69.0%</td>
+            <td class="">+236.1%</td>
+            <td class="pos">+162.3%</td>
+            <td class="pos">+93.3%</td>
+        </tr><tr class="row-lose">
+            <td>2025-03</td>
+            <td>$23.11</td>
+            <td class="pos">+211.9%</td>
+            <td class="">+150.2%</td>
+            <td class="neg">-61.7%</td>
+            <td class="">+192.3%</td>
+            <td class="neg">-19.6%</td>
+            <td class="pos">+42.1%</td>
+        </tr><tr class="row-lose">
+            <td>2025-04</td>
+            <td>$23.19</td>
+            <td class="pos">+210.8%</td>
+            <td class="">+109.4%</td>
+            <td class="neg">-101.4%</td>
+            <td class="">+92.2%</td>
+            <td class="neg">-118.6%</td>
+            <td class="neg">-17.2%</td>
+        </tr><tr class="row-lose">
+            <td>2025-05</td>
+            <td>$27.38</td>
+            <td class="pos">+163.2%</td>
+            <td class="">+109.4%</td>
+            <td class="neg">-53.8%</td>
+            <td class="">+92.2%</td>
+            <td class="neg">-71.0%</td>
+            <td class="neg">-17.2%</td>
+        </tr><tr class="row-win">
+            <td>2025-06</td>
+            <td>$40.57</td>
+            <td class="pos">+77.6%</td>
+            <td class="">+81.6%</td>
+            <td class="pos">+4.0%</td>
+            <td class="">+67.1%</td>
+            <td class="neg">-10.5%</td>
+            <td class="neg">-14.5%</td>
+        </tr><tr class="row-win">
+            <td>2025-07</td>
+            <td>$40.10</td>
+            <td class="pos">+79.7%</td>
+            <td class="">+81.6%</td>
+            <td class="pos">+1.9%</td>
+            <td class="">+67.1%</td>
+            <td class="neg">-12.6%</td>
+            <td class="neg">-14.5%</td>
+        </tr><tr class="row-lose">
+            <td>2025-08</td>
+            <td>$38.12</td>
+            <td class="pos">+89.1%</td>
+            <td class="">+30.9%</td>
+            <td class="neg">-58.1%</td>
+            <td class="">+26.4%</td>
+            <td class="neg">-62.7%</td>
+            <td class="neg">-4.6%</td>
+        </tr><tr class="row-lose">
+            <td>2025-09</td>
+            <td>$42.99</td>
+            <td class="pos">+67.6%</td>
+            <td class="">+30.9%</td>
+            <td class="neg">-36.7%</td>
+            <td class="">+26.4%</td>
+            <td class="neg">-41.3%</td>
+            <td class="neg">-4.6%</td>
+        </tr><tr class="row-win">
+            <td>2025-10</td>
+            <td>$63.09</td>
+            <td class="pos">+14.2%</td>
+            <td class="">+22.7%</td>
+            <td class="pos">+8.5%</td>
+            <td class="">+15.0%</td>
+            <td class="pos">+0.8%</td>
+            <td class="neg">-7.7%</td>
+        </tr><tr class="row-win">
+            <td>2025-11</td>
+            <td>$58.40</td>
+            <td class="pos">+23.4%</td>
+            <td class="">+104.3%</td>
+            <td class="pos">+80.9%</td>
+            <td class="">+101.1%</td>
+            <td class="pos">+77.7%</td>
+            <td class="neg">-3.1%</td>
+        </tr><tr class="row-lose">
+            <td>2025-12</td>
+            <td>$47.12</td>
+            <td class="pos">+52.9%</td>
+            <td class="">+41.2%</td>
+            <td class="neg">-11.7%</td>
+            <td class="">+52.1%</td>
+            <td class="neg">-0.9%</td>
+            <td class="pos">+10.8%</td>
+        </tr><tr class="row-lose">
+            <td>2026-01</td>
+            <td>$46.77</td>
+            <td class="pos">+54.1%</td>
+            <td class="">+40.2%</td>
+            <td class="neg">-13.9%</td>
+            <td class="">+32.2%</td>
+            <td class="neg">-21.8%</td>
+            <td class="neg">-7.9%</td>
+        </tr><tr class="row-lose">
+            <td>2026-02</td>
+            <td>$38.56</td>
+            <td class="pos">+86.9%</td>
+            <td class="">+53.4%</td>
+            <td class="neg">-33.5%</td>
+            <td class="">+32.2%</td>
+            <td class="neg">-54.7%</td>
+            <td class="neg">-21.2%</td>
+        </tr><tr class="row-lose">
+            <td>2026-03</td>
+            <td>$38.34</td>
+            <td class="pos">+88.0%</td>
+            <td class="">+58.0%</td>
+            <td class="neg">-29.9%</td>
+            <td class="">+32.2%</td>
+            <td class="neg">-55.7%</td>
+            <td class="neg">-25.8%</td>
+        </tr><tr class="row-lose">
+            <td>2026-04</td>
+            <td>$27.79</td>
+            <td class="pos">+159.3%</td>
+            <td class="">+21.6%</td>
+            <td class="neg">-137.8%</td>
+            <td class="">+15.0%</td>
+            <td class="neg">-144.3%</td>
+            <td class="neg">-6.6%</td>
+        </tr></tbody>
+</table>
+</div>
+
+<!-- ── 5. 指値売りトレード履歴 ── -->
+<h2>5. 方式B（指値売り）トレード履歴（-15%/+15%, lb=20）</h2>
+<div class="table-wrap">
+<table>
+<thead><tr>
+  <th>No.</th><th>買い日</th><th>買値</th><th>売り日</th><th>売値</th><th>損益</th><th>保有日数</th><th>備考</th>
+</tr></thead>
+<tbody><tr >
+            <td>1</td>
+            <td>2023-08-07</td><td>$15.58</td>
+            <td>2023-09-05</td><td>$17.92</td>
+            <td class="pos">+15.0%</td>
+            <td>20日</td>
+            <td></td>
+        </tr><tr >
+            <td>2</td>
+            <td>2023-09-18</td><td>$16.16</td>
+            <td>2024-11-07</td><td>$18.58</td>
+            <td class="pos">+15.0%</td>
+            <td>288日</td>
+            <td></td>
+        </tr><tr >
+            <td>3</td>
+            <td>2024-12-11</td><td>$29.83</td>
+            <td>2024-12-16</td><td>$34.30</td>
+            <td class="pos">+15.0%</td>
+            <td>3日</td>
+            <td></td>
+        </tr><tr >
+            <td>4</td>
+            <td>2025-01-08</td><td>$30.25</td>
+            <td>2025-01-15</td><td>$34.79</td>
+            <td class="pos">+15.0%</td>
+            <td>4日</td>
+            <td></td>
+        </tr><tr >
+            <td>5</td>
+            <td>2025-01-16</td><td>$41.55</td>
+            <td>2025-05-22</td><td>$47.78</td>
+            <td class="pos">+15.0%</td>
+            <td>87日</td>
+            <td></td>
+        </tr><tr >
+            <td>6</td>
+            <td>2025-05-30</td><td>$40.34</td>
+            <td>2025-07-07</td><td>$46.39</td>
+            <td class="pos">+15.0%</td>
+            <td>24日</td>
+            <td></td>
+        </tr><tr >
+            <td>7</td>
+            <td>2025-08-01</td><td>$38.12</td>
+            <td>2025-08-11</td><td>$43.84</td>
+            <td class="pos">+15.0%</td>
+            <td>6日</td>
+            <td></td>
+        </tr><tr >
+            <td>8</td>
+            <td>2025-08-19</td><td>$36.80</td>
+            <td>2025-08-27</td><td>$42.32</td>
+            <td class="pos">+15.0%</td>
+            <td>6日</td>
+            <td></td>
+        </tr><tr >
+            <td>9</td>
+            <td>2025-09-30</td><td>$61.50</td>
+            <td>2025-10-03</td><td>$70.72</td>
+            <td class="pos">+15.0%</td>
+            <td>3日</td>
+            <td></td>
+        </tr><tr class="open-pos">
+            <td>10</td>
+            <td>2025-10-16</td><td>$65.59</td>
+            <td>2026-05-29</td><td>$72.07</td>
+            <td class="pos">+9.9%</td>
+            <td>154日</td>
+            <td><em>保有中</em></td>
+        </tr></tbody>
+</table>
+</div>
+
+<!-- ── 6. 実運用への示唆 ── -->
+<h2>6. 実運用への示唆と改善案</h2>
+<div class="warn-box">
+  <strong>現状の問題：</strong><br>
+  現在の運用（指値$51.91）は方式Bに相当し、バックテストの+636%は実際には再現できていない可能性がある。
+  指値を使う限り、上昇が続く局面での利益を目標価格で打ち切ってしまう。
+</div>
+<div class="insight">
+  <strong>改善案1：売り目標を引き上げる</strong><br>
+  指値注文を使いながら上昇の恩恵を取り込むには、売り目標を+15%より高く設定する（例：+20〜25%）。
+  指値でも利益を確実に確保しつつ、より大きなリターンを狙える。
+</div>
+<div class="insight">
+  <strong>改善案2：段階的な利確（トレーリング）</strong><br>
+  目標到達後も株価が上昇し続ける場合、指値を引き上げながら保有継続する方法。
+  ただし楽天証券の操作が必要になり運用の手間が増える。
+</div>
+<div class="info-box">
+  <strong>結論：</strong><br>
+  IONQのような高ボラティリティ銘柄では「上昇が始まると終値が目標を大きく超える」特性があるため、
+  厳密な指値よりも終値ベースのシグナルで判断するほうがパフォーマンスが高い傾向がある。
+  実運用との乖離を縮めるなら、<strong>売り目標を+20〜25%に引き上げて指値設定する</strong>ことが最もシンプルな改善策。
+</div>
+
+</div>
+</body>
+</html>
