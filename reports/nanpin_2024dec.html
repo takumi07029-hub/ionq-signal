@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IONQ ナンピン戦略比較レポート（2024年12月以降）</title>
+<style>
+  :root{--bg:#0f1117;--card:#1a1d2e;--border:#2a2d3a;--pos:#4ade80;--neg:#f87171;--neutral:#94a3b8;--accent:#60a5fa;--warn:#fbbf24;--best:#a78bfa;--text:#e2e8f0;--sub:#64748b;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',sans-serif;font-size:13px;line-height:1.6;}
+  .container{max-width:1100px;margin:0 auto;padding:24px 16px;}
+  h1{font-size:21px;color:#fff;margin-bottom:4px;}
+  .meta{color:var(--sub);font-size:12px;margin-bottom:24px;}
+  h2{font-size:15px;color:var(--accent);margin:32px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+  h3{font-size:13px;color:var(--neutral);margin:16px 0 6px;}
+  .premise{background:#1a2238;border-left:3px solid var(--accent);border-radius:6px;padding:13px 16px;margin-bottom:18px;font-size:12px;line-height:2;}
+  .insight{background:#1e2a1e;border-left:3px solid var(--pos);border-radius:6px;padding:11px 14px;margin-bottom:10px;font-size:12px;line-height:1.9;}
+  .warn-box{background:#2a1e1e;border-left:3px solid var(--neg);border-radius:6px;padding:11px 14px;margin-bottom:10px;font-size:12px;line-height:1.9;}
+  .table-wrap{overflow-x:auto;margin-bottom:18px;}
+  table{border-collapse:collapse;width:100%;font-size:12px;}
+  th{background:#1e2238;color:var(--neutral);padding:7px 9px;text-align:center;border:1px solid var(--border);white-space:nowrap;font-weight:600;}
+  td{padding:6px 9px;border:1px solid var(--border);text-align:center;white-space:nowrap;}
+  td.left{text-align:left;}
+  tr:hover td{background:rgba(255,255,255,0.03);}
+  .pos{color:var(--pos);font-weight:600;} .neg{color:var(--neg);font-weight:600;} .na{color:var(--sub);}
+  .best-row td{background:rgba(167,139,250,0.12);} .best-row td:first-child{color:var(--best);font-weight:bold;}
+  .bh-row td{border-top:2px solid var(--border);color:var(--sub);}
+  .buy-row td{background:rgba(96,165,250,0.05);} .sell-row td{background:rgba(74,222,128,0.05);}
+  .buy-tag{color:var(--accent);font-weight:bold;} .sell-tag{color:var(--pos);font-weight:bold;}
+  .win-badge{display:inline-block;background:rgba(74,222,128,0.15);color:var(--pos);border-radius:4px;padding:1px 7px;font-size:11px;font-weight:bold;margin-left:6px;}
+  .strat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+  .strat-card{background:var(--card);border-radius:10px;padding:14px;}
+  .strat-card h3{margin-top:0;color:#fff;}
+  .strat-card .ret{font-size:28px;font-weight:bold;margin:6px 0 3px;}
+  .strat-card .detail{font-size:11px;color:var(--neutral);line-height:2;}
+  @media(max-width:600px){.strat-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>IONQ ナンピン戦略比較レポート（2024年12月以降）</h1>
+<div class="meta">作成日時: 2026/8/14 0:25:27 ／ 分析期間: 2024-12-02 ～ 2026-08-13（425営業日）</div>
+
+<div class="premise">
+  <strong>分析前提</strong><br>
+  ・ベース戦略：-10%買い（終値）＋ +15%売り（指値＝日中高値で約定）<br>
+  ・月次追加資金：$200/月（≈¥30,000）を毎月積立。未使用分は翌月繰越。<br>
+  ・売却：平均取得単価 × 1.15 に日中高値が達した時点で全株指値売却<br>
+  ・DCA買持ち：毎月$200分だけ購入して一切売らない（ベンチマーク）<br>
+  ・返率計算：（最終ポートフォリオ価値 − 総入金額）÷ 総入金額<br>
+  ・<strong>分析期間：2024年12月以降のみ</strong>（高値圏の株価データを使用した現実的な検証）
+</div>
+
+<!-- ── 1. 全期間サマリ ── -->
+<h2>1. 全期間 戦略比較サマリ</h2>
+<div class="strat-grid">
+  
+  <div class="strat-card" >
+    <h3>ベース（ナンピンなし）</h3>
+    <div class="ret neg">-2.2%</div>
+    <div class="detail">
+      最終価値 $4109 ／ 投入合計 $4200<br>
+      買い7回 ／ 売り6回<br>
+      現金残 $2015 ／ 保有 46株 @ $45.52
+    </div>
+  </div>
+  <div class="strat-card" style="border-top:2px solid var(--best)">
+    <h3>案A：シグナル再発生ナンピン</h3>
+    <div class="ret pos">+25.5%</div>
+    <div class="detail">
+      最終価値 $5271 ／ 投入合計 $4200<br>
+      買い27回 ／ 売り7回<br>
+      現金残 $36 ／ 保有 115株 @ $45.52
+    </div>
+  </div>
+  <div class="strat-card" >
+    <h3>案B-15：平均単価-15%ナンピン</h3>
+    <div class="ret pos">+22.2%</div>
+    <div class="detail">
+      最終価値 $5134 ／ 投入合計 $4200<br>
+      買い23回 ／ 売り7回<br>
+      現金残 $36 ／ 保有 112株 @ $45.52
+    </div>
+  </div>
+  <div class="strat-card" >
+    <h3>案B-20：平均単価-20%ナンピン</h3>
+    <div class="ret pos">+21.0%</div>
+    <div class="detail">
+      最終価値 $5083 ／ 投入合計 $4200<br>
+      買い23回 ／ 売り7回<br>
+      現金残 $30 ／ 保有 111株 @ $45.52
+    </div>
+  </div>
+  <div class="strat-card" >
+    <h3>案B-25：平均単価-25%ナンピン</h3>
+    <div class="ret pos">+21.6%</div>
+    <div class="detail">
+      最終価値 $5107 ／ 投入合計 $4200<br>
+      買い20回 ／ 売り7回<br>
+      現金残 $9 ／ 保有 112株 @ $45.52
+    </div>
+  </div>
+  <div class="strat-card" >
+    <h3>案C：毎月定額積立（月初全額）</h3>
+    <div class="ret pos">+11.7%</div>
+    <div class="detail">
+      最終価値 $4692 ／ 投入合計 $4200<br>
+      買い21回 ／ 売り8回<br>
+      現金残 $3 ／ 保有 103株 @ $45.52
+    </div>
+  </div>
+  <div class="strat-card" >
+    <h3>案D：段階的ナンピン（-10/-20/-30%）</h3>
+    <div class="ret pos">+1.7%</div>
+    <div class="detail">
+      最終価値 $4271 ／ 投入合計 $4200<br>
+      買い16回 ／ 売り8回<br>
+      現金残 $2041 ／ 保有 49株 @ $45.52
+    </div>
+  </div>
+</div>
+
+<div class="table-wrap"><table>
+<thead><tr><th>戦略</th><th>総リターン</th><th>最終価値</th><th>総投入額</th><th>買い回数</th><th>売り回数</th><th>現金残</th><th>保有状況</th></tr></thead>
+<tbody><tr >
+          <td class="left">ベース（ナンピンなし）</td>
+          <td class="neg">-2.2%</td>
+          <td>$4109</td>
+          <td>$4200</td>
+          <td>7回</td>
+          <td>6回</td>
+          <td>$2015</td>
+          <td>46株 @ $45.52</td>
+        </tr><tr class="best-row">
+          <td class="left">案A：シグナル再発生ナンピン</td>
+          <td class="pos">+25.5%</td>
+          <td>$5271</td>
+          <td>$4200</td>
+          <td>27回</td>
+          <td>7回</td>
+          <td>$36</td>
+          <td>115株 @ $45.52</td>
+        </tr><tr >
+          <td class="left">案B-15：平均単価-15%ナンピン</td>
+          <td class="pos">+22.2%</td>
+          <td>$5134</td>
+          <td>$4200</td>
+          <td>23回</td>
+          <td>7回</td>
+          <td>$36</td>
+          <td>112株 @ $45.52</td>
+        </tr><tr >
+          <td class="left">案B-20：平均単価-20%ナンピン</td>
+          <td class="pos">+21.0%</td>
+          <td>$5083</td>
+          <td>$4200</td>
+          <td>23回</td>
+          <td>7回</td>
+          <td>$30</td>
+          <td>111株 @ $45.52</td>
+        </tr><tr >
+          <td class="left">案B-25：平均単価-25%ナンピン</td>
+          <td class="pos">+21.6%</td>
+          <td>$5107</td>
+          <td>$4200</td>
+          <td>20回</td>
+          <td>7回</td>
+          <td>$9</td>
+          <td>112株 @ $45.52</td>
+        </tr><tr >
+          <td class="left">案C：毎月定額積立（月初全額）</td>
+          <td class="pos">+11.7%</td>
+          <td>$4692</td>
+          <td>$4200</td>
+          <td>21回</td>
+          <td>8回</td>
+          <td>$3</td>
+          <td>103株 @ $45.52</td>
+        </tr><tr >
+          <td class="left">案D：段階的ナンピン（-10/-20/-30%）</td>
+          <td class="pos">+1.7%</td>
+          <td>$4271</td>
+          <td>$4200</td>
+          <td>16回</td>
+          <td>8回</td>
+          <td>$2041</td>
+          <td>49株 @ $45.52</td>
+        </tr><tr class="bh-row">
+        <td class="left">【参考】DCA買持ち（売らない）</td>
+        <td class="pos">+7.3%</td>
+        <td>$4506</td>
+        <td>$4200</td>
+        <td>-</td><td>-</td><td>$0</td>
+        <td>99株</td>
+    </tr></tbody>
+</table></div>
+
+<!-- ── 2. 各戦略 詳細 ── -->
+<h2>2. 各戦略 取引詳細</h2>
+
+<h3>ベース（ナンピンなし）：リターン -2.2%</h3>
+<div class="table-wrap"><table>
+    <thead><tr><th>日付</th><th>種別</th><th>価格</th><th>株数</th><th>平均取得単価</th><th>損益</th></tr></thead>
+    <tbody><tr class="buy-row">
+                <td>2024-12-31</td><td class="buy-tag">買い</td>
+                <td>$41.77</td><td>+4株（計4株）</td>
+                <td>$41.77</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-01-06</td><td class="sell-tag">売り</td>
+                <td>$48.04</td><td>-4株</td>
+                <td>$41.77</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-01-08</td><td class="buy-tag">買い</td>
+                <td>$30.25</td><td>+14株（計14株）</td>
+                <td>$30.25</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-01-15</td><td class="sell-tag">売り</td>
+                <td>$34.79</td><td>-14株</td>
+                <td>$30.25</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-01-16</td><td class="buy-tag">買い</td>
+                <td>$41.55</td><td>+11株（計11株）</td>
+                <td>$41.55</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-05-22</td><td class="sell-tag">売り</td>
+                <td>$47.78</td><td>-11株</td>
+                <td>$41.55</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-05-29</td><td class="buy-tag">買い</td>
+                <td>$43.20</td><td>+31株（計31株）</td>
+                <td>$43.20</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-09-12</td><td class="sell-tag">売り</td>
+                <td>$49.68</td><td>-31株</td>
+                <td>$43.20</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-09-26</td><td class="buy-tag">買い</td>
+                <td>$67.28</td><td>+35株（計35株）</td>
+                <td>$67.28</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-10-06</td><td class="sell-tag">売り</td>
+                <td>$77.37</td><td>-35株</td>
+                <td>$67.28</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-10-10</td><td class="buy-tag">買い</td>
+                <td>$70.65</td><td>+41株（計41株）</td>
+                <td>$70.65</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-10-13</td><td class="sell-tag">売り</td>
+                <td>$81.25</td><td>-41株</td>
+                <td>$70.65</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-10-15</td><td class="buy-tag">買い</td>
+                <td>$72.41</td><td>+46株（計46株）</td>
+                <td>$72.41</td><td>-</td></tr></tbody></table></div>
+
+<h3>案A（シグナル再発生ナンピン）：リターン +25.5%</h3>
+<p style="font-size:11px;color:var(--sub);margin-bottom:6px">-10%シグナル発生時、保有中でも追加買い。月次資金を最大活用。</p>
+<div class="table-wrap"><table>
+    <thead><tr><th>日付</th><th>種別</th><th>価格</th><th>株数</th><th>平均取得単価</th><th>損益</th></tr></thead>
+    <tbody><tr class="buy-row">
+                <td>2024-12-31</td><td class="buy-tag">買い</td>
+                <td>$41.77</td><td>+4株（計4株）</td>
+                <td>$41.77</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-01-02</td><td class="buy-tag">買い</td>
+                <td>$43.10</td><td>+5株（計9株）</td>
+                <td>$42.51</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-01-06</td><td class="sell-tag">売り</td>
+                <td>$48.89</td><td>-9株</td>
+                <td>$42.51</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-01-08</td><td class="buy-tag">買い</td>
+                <td>$30.25</td><td>+15株（計15株）</td>
+                <td>$30.25</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-01-15</td><td class="sell-tag">売り</td>
+                <td>$34.79</td><td>-15株</td>
+                <td>$30.25</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-01-16</td><td class="buy-tag">買い</td>
+                <td>$41.55</td><td>+12株（計12株）</td>
+                <td>$41.55</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-02-03</td><td class="buy-tag">買い</td>
+                <td>$41.47</td><td>+5株（計17株）</td>
+                <td>$41.53</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-03-03</td><td class="buy-tag">買い</td>
+                <td>$23.11</td><td>+9株（計26株）</td>
+                <td>$35.15</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-04-01</td><td class="buy-tag">買い</td>
+                <td>$23.19</td><td>+9株（計35株）</td>
+                <td>$32.08</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-05-22</td><td class="sell-tag">売り</td>
+                <td>$36.89</td><td>-35株</td>
+                <td>$32.08</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-05-29</td><td class="buy-tag">買い</td>
+                <td>$43.20</td><td>+34株（計34株）</td>
+                <td>$43.20</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-06-02</td><td class="buy-tag">買い</td>
+                <td>$40.57</td><td>+5株（計39株）</td>
+                <td>$42.86</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-07-29</td><td class="buy-tag">買い</td>
+                <td>$40.53</td><td>+5株（計44株）</td>
+                <td>$42.60</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-08-01</td><td class="buy-tag">買い</td>
+                <td>$38.12</td><td>+5株（計49株）</td>
+                <td>$42.14</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-09-12</td><td class="sell-tag">売り</td>
+                <td>$48.46</td><td>-49株</td>
+                <td>$42.14</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-09-26</td><td class="buy-tag">買い</td>
+                <td>$67.28</td><td>+38株（計38株）</td>
+                <td>$67.28</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-10-01</td><td class="buy-tag">買い</td>
+                <td>$63.09</td><td>+3株（計41株）</td>
+                <td>$66.97</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-10-06</td><td class="sell-tag">売り</td>
+                <td>$77.02</td><td>-41株</td>
+                <td>$66.97</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-10-10</td><td class="buy-tag">買い</td>
+                <td>$70.65</td><td>+45株（計45株）</td>
+                <td>$70.65</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-10-13</td><td class="sell-tag">売り</td>
+                <td>$81.25</td><td>-45株</td>
+                <td>$70.65</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-10-15</td><td class="buy-tag">買い</td>
+                <td>$72.41</td><td>+50株（計50株）</td>
+                <td>$72.41</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-10-16</td><td class="buy-tag">買い</td>
+                <td>$65.59</td><td>+1株（計51株）</td>
+                <td>$72.28</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-11-03</td><td class="buy-tag">買い</td>
+                <td>$58.40</td><td>+3株（計54株）</td>
+                <td>$71.51</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-12-01</td><td class="buy-tag">買い</td>
+                <td>$47.12</td><td>+4株（計58株）</td>
+                <td>$69.82</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-01-02</td><td class="buy-tag">買い</td>
+                <td>$46.77</td><td>+5株（計63株）</td>
+                <td>$67.99</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-02-02</td><td class="buy-tag">買い</td>
+                <td>$38.56</td><td>+5株（計68株）</td>
+                <td>$65.83</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-03-05</td><td class="buy-tag">買い</td>
+                <td>$36.02</td><td>+5株（計73株）</td>
+                <td>$63.79</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-03-06</td><td class="buy-tag">買い</td>
+                <td>$35.73</td><td>+1株（計74株）</td>
+                <td>$63.41</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-04-01</td><td class="buy-tag">買い</td>
+                <td>$27.79</td><td>+7株（計81株）</td>
+                <td>$60.33</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-05-18</td><td class="buy-tag">買い</td>
+                <td>$49.31</td><td>+4株（計85株）</td>
+                <td>$59.81</td><td>-</td></tr><tr class="sell-row">
+                <td>2026-05-28</td><td class="sell-tag">売り</td>
+                <td>$68.78</td><td>-85株</td>
+                <td>$59.81</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2026-06-05</td><td class="buy-tag">買い</td>
+                <td>$56.78</td><td>+106株（計106株）</td>
+                <td>$56.78</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-07-01</td><td class="buy-tag">買い</td>
+                <td>$51.40</td><td>+4株（計110株）</td>
+                <td>$56.58</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-08-03</td><td class="buy-tag">買い</td>
+                <td>$38.85</td><td>+5株（計115株）</td>
+                <td>$55.81</td><td>-</td></tr></tbody></table></div>
+
+<h3>案B-15（平均単価-15%ナンピン）：リターン +22.2%</h3>
+<p style="font-size:11px;color:var(--sub);margin-bottom:6px">初回は-10%シグナルで購入。その後、平均取得単価から-15%下落したら追加買い。</p>
+<div class="table-wrap"><table>
+    <thead><tr><th>日付</th><th>種別</th><th>価格</th><th>株数</th><th>平均取得単価</th><th>損益</th></tr></thead>
+    <tbody><tr class="buy-row">
+                <td>2024-12-31</td><td class="buy-tag">買い</td>
+                <td>$41.77</td><td>+4株（計4株）</td>
+                <td>$41.77</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-01-06</td><td class="sell-tag">売り</td>
+                <td>$48.04</td><td>-4株</td>
+                <td>$41.77</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-01-08</td><td class="buy-tag">買い</td>
+                <td>$30.25</td><td>+14株（計14株）</td>
+                <td>$30.25</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-01-15</td><td class="sell-tag">売り</td>
+                <td>$34.79</td><td>-14株</td>
+                <td>$30.25</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-01-16</td><td class="buy-tag">買い</td>
+                <td>$41.55</td><td>+11株（計11株）</td>
+                <td>$41.55</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-02-18</td><td class="buy-tag">買い</td>
+                <td>$33.94</td><td>+6株（計17株）</td>
+                <td>$38.86</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-02-27</td><td class="buy-tag">買い</td>
+                <td>$24.91</td><td>+1株（計18株）</td>
+                <td>$38.09</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-03-03</td><td class="buy-tag">買い</td>
+                <td>$23.11</td><td>+8株（計26株）</td>
+                <td>$33.48</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-04-01</td><td class="buy-tag">買い</td>
+                <td>$23.19</td><td>+9株（計35株）</td>
+                <td>$30.83</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-05-20</td><td class="sell-tag">売り</td>
+                <td>$35.46</td><td>-35株</td>
+                <td>$30.83</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-05-29</td><td class="buy-tag">買い</td>
+                <td>$43.20</td><td>+33株（計33株）</td>
+                <td>$43.20</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-06-05</td><td class="buy-tag">買い</td>
+                <td>$36.66</td><td>+6株（計39株）</td>
+                <td>$42.19</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-09-12</td><td class="sell-tag">売り</td>
+                <td>$48.52</td><td>-39株</td>
+                <td>$42.19</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-09-26</td><td class="buy-tag">買い</td>
+                <td>$67.28</td><td>+37株（計37株）</td>
+                <td>$67.28</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-10-06</td><td class="sell-tag">売り</td>
+                <td>$77.37</td><td>-37株</td>
+                <td>$67.28</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-10-10</td><td class="buy-tag">買い</td>
+                <td>$70.65</td><td>+43株（計43株）</td>
+                <td>$70.65</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-10-13</td><td class="sell-tag">売り</td>
+                <td>$81.25</td><td>-43株</td>
+                <td>$70.65</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-10-15</td><td class="buy-tag">買い</td>
+                <td>$72.41</td><td>+48株（計48株）</td>
+                <td>$72.41</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-11-03</td><td class="buy-tag">買い</td>
+                <td>$58.40</td><td>+4株（計52株）</td>
+                <td>$71.33</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-12-01</td><td class="buy-tag">買い</td>
+                <td>$47.12</td><td>+4株（計56株）</td>
+                <td>$69.60</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-01-02</td><td class="buy-tag">買い</td>
+                <td>$46.77</td><td>+4株（計60株）</td>
+                <td>$68.08</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-01-30</td><td class="buy-tag">買い</td>
+                <td>$39.98</td><td>+1株（計61株）</td>
+                <td>$67.62</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-02-02</td><td class="buy-tag">買い</td>
+                <td>$38.56</td><td>+5株（計66株）</td>
+                <td>$65.42</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-03-02</td><td class="buy-tag">買い</td>
+                <td>$38.34</td><td>+5株（計71株）</td>
+                <td>$63.51</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-04-01</td><td class="buy-tag">買い</td>
+                <td>$27.79</td><td>+7株（計78株）</td>
+                <td>$60.31</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-05-01</td><td class="buy-tag">買い</td>
+                <td>$46.20</td><td>+4株（計82株）</td>
+                <td>$59.62</td><td>-</td></tr><tr class="sell-row">
+                <td>2026-05-28</td><td class="sell-tag">売り</td>
+                <td>$68.56</td><td>-82株</td>
+                <td>$59.62</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2026-06-05</td><td class="buy-tag">買い</td>
+                <td>$56.78</td><td>+103株（計103株）</td>
+                <td>$56.78</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-07-07</td><td class="buy-tag">買い</td>
+                <td>$45.36</td><td>+4株（計107株）</td>
+                <td>$56.35</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-08-03</td><td class="buy-tag">買い</td>
+                <td>$38.85</td><td>+5株（計112株）</td>
+                <td>$55.57</td><td>-</td></tr></tbody></table></div>
+
+<h3>案B-20（平均単価-20%ナンピン）：リターン +21.0%</h3>
+<p style="font-size:11px;color:var(--sub);margin-bottom:6px">初回は-10%シグナルで購入。その後、平均取得単価から-20%下落したら追加買い。</p>
+<div class="table-wrap"><table>
+    <thead><tr><th>日付</th><th>種別</th><th>価格</th><th>株数</th><th>平均取得単価</th><th>損益</th></tr></thead>
+    <tbody><tr class="buy-row">
+                <td>2024-12-31</td><td class="buy-tag">買い</td>
+                <td>$41.77</td><td>+4株（計4株）</td>
+                <td>$41.77</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-01-06</td><td class="sell-tag">売り</td>
+                <td>$48.04</td><td>-4株</td>
+                <td>$41.77</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-01-08</td><td class="buy-tag">買い</td>
+                <td>$30.25</td><td>+14株（計14株）</td>
+                <td>$30.25</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-01-15</td><td class="sell-tag">売り</td>
+                <td>$34.79</td><td>-14株</td>
+                <td>$30.25</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-01-16</td><td class="buy-tag">買い</td>
+                <td>$41.55</td><td>+11株（計11株）</td>
+                <td>$41.55</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-02-21</td><td class="buy-tag">買い</td>
+                <td>$31.74</td><td>+7株（計18株）</td>
+                <td>$37.73</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-03-03</td><td class="buy-tag">買い</td>
+                <td>$23.11</td><td>+9株（計27株）</td>
+                <td>$32.86</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-04-01</td><td class="buy-tag">買い</td>
+                <td>$23.19</td><td>+8株（計35株）</td>
+                <td>$30.65</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-05-14</td><td class="sell-tag">売り</td>
+                <td>$35.25</td><td>-35株</td>
+                <td>$30.65</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-05-29</td><td class="buy-tag">買い</td>
+                <td>$43.20</td><td>+33株（計33株）</td>
+                <td>$43.20</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-09-12</td><td class="sell-tag">売り</td>
+                <td>$49.68</td><td>-33株</td>
+                <td>$43.20</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-09-26</td><td class="buy-tag">買い</td>
+                <td>$67.28</td><td>+36株（計36株）</td>
+                <td>$67.28</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-10-06</td><td class="sell-tag">売り</td>
+                <td>$77.37</td><td>-36株</td>
+                <td>$67.28</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-10-10</td><td class="buy-tag">買い</td>
+                <td>$70.65</td><td>+42株（計42株）</td>
+                <td>$70.65</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-10-13</td><td class="sell-tag">売り</td>
+                <td>$81.25</td><td>-42株</td>
+                <td>$70.65</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-10-15</td><td class="buy-tag">買い</td>
+                <td>$72.41</td><td>+47株（計47株）</td>
+                <td>$72.41</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-10-22</td><td class="buy-tag">買い</td>
+                <td>$55.45</td><td>+1株（計48株）</td>
+                <td>$72.06</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-11-04</td><td class="buy-tag">買い</td>
+                <td>$53.38</td><td>+3株（計51株）</td>
+                <td>$70.96</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-11-12</td><td class="buy-tag">買い</td>
+                <td>$50.71</td><td>+1株（計52株）</td>
+                <td>$70.57</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-12-01</td><td class="buy-tag">買い</td>
+                <td>$47.12</td><td>+4株（計56株）</td>
+                <td>$68.89</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-01-02</td><td class="buy-tag">買い</td>
+                <td>$46.77</td><td>+4株（計60株）</td>
+                <td>$67.42</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-02-02</td><td class="buy-tag">買い</td>
+                <td>$38.56</td><td>+5株（計65株）</td>
+                <td>$65.20</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-02-05</td><td class="buy-tag">買い</td>
+                <td>$30.43</td><td>+1株（計66株）</td>
+                <td>$64.67</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-03-02</td><td class="buy-tag">買い</td>
+                <td>$38.34</td><td>+5株（計71株）</td>
+                <td>$62.82</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-04-01</td><td class="buy-tag">買い</td>
+                <td>$27.79</td><td>+7株（計78株）</td>
+                <td>$59.67</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-05-01</td><td class="buy-tag">買い</td>
+                <td>$46.20</td><td>+4株（計82株）</td>
+                <td>$59.02</td><td>-</td></tr><tr class="sell-row">
+                <td>2026-05-28</td><td class="sell-tag">売り</td>
+                <td>$67.87</td><td>-82株</td>
+                <td>$59.02</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2026-06-05</td><td class="buy-tag">買い</td>
+                <td>$56.78</td><td>+102株（計102株）</td>
+                <td>$56.78</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-07-07</td><td class="buy-tag">買い</td>
+                <td>$45.36</td><td>+4株（計106株）</td>
+                <td>$56.35</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-08-03</td><td class="buy-tag">買い</td>
+                <td>$38.85</td><td>+5株（計111株）</td>
+                <td>$55.56</td><td>-</td></tr></tbody></table></div>
+
+<h3>案C（毎月定額積立）：リターン +11.7%</h3>
+<p style="font-size:11px;color:var(--sub);margin-bottom:6px">月初に$200を全額IONQ購入。売りシグナルは同様（+15%指値）。</p>
+<div class="table-wrap"><table>
+    <thead><tr><th>日付</th><th>種別</th><th>価格</th><th>株数</th><th>平均取得単価</th><th>損益</th></tr></thead>
+    <tbody><tr class="buy-row">
+                <td>2024-12-03</td><td class="buy-tag">買い</td>
+                <td>$32.79</td><td>+6株（計6株）</td>
+                <td>$32.79</td><td>-</td></tr><tr class="sell-row">
+                <td>2024-12-06</td><td class="sell-tag">売り</td>
+                <td>$37.71</td><td>-6株</td>
+                <td>$32.79</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-01-02</td><td class="buy-tag">買い</td>
+                <td>$43.10</td><td>+9株（計9株）</td>
+                <td>$43.10</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-01-06</td><td class="sell-tag">売り</td>
+                <td>$49.56</td><td>-9株</td>
+                <td>$43.10</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-02-03</td><td class="buy-tag">買い</td>
+                <td>$41.47</td><td>+16株（計16株）</td>
+                <td>$41.47</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-03-03</td><td class="buy-tag">買い</td>
+                <td>$23.11</td><td>+9株（計25株）</td>
+                <td>$34.86</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-04-01</td><td class="buy-tag">買い</td>
+                <td>$23.19</td><td>+9株（計34株）</td>
+                <td>$31.77</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-05-01</td><td class="buy-tag">買い</td>
+                <td>$27.38</td><td>+7株（計41株）</td>
+                <td>$31.02</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-05-20</td><td class="sell-tag">売り</td>
+                <td>$35.67</td><td>-41株</td>
+                <td>$31.02</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-06-02</td><td class="buy-tag">買い</td>
+                <td>$40.57</td><td>+41株（計41株）</td>
+                <td>$40.57</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-07-01</td><td class="buy-tag">買い</td>
+                <td>$40.10</td><td>+5株（計46株）</td>
+                <td>$40.52</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-07-07</td><td class="sell-tag">売り</td>
+                <td>$46.60</td><td>-46株</td>
+                <td>$40.52</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-08-01</td><td class="buy-tag">買い</td>
+                <td>$38.12</td><td>+61株（計61株）</td>
+                <td>$38.12</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-08-11</td><td class="sell-tag">売り</td>
+                <td>$43.84</td><td>-61株</td>
+                <td>$38.12</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-09-02</td><td class="buy-tag">買い</td>
+                <td>$42.99</td><td>+67株（計67株）</td>
+                <td>$42.99</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-09-12</td><td class="sell-tag">売り</td>
+                <td>$49.44</td><td>-67株</td>
+                <td>$42.99</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-10-01</td><td class="buy-tag">買い</td>
+                <td>$63.09</td><td>+56株（計56株）</td>
+                <td>$63.09</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-10-03</td><td class="sell-tag">売り</td>
+                <td>$72.55</td><td>-56株</td>
+                <td>$63.09</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-11-03</td><td class="buy-tag">買い</td>
+                <td>$58.40</td><td>+73株（計73株）</td>
+                <td>$58.40</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-12-01</td><td class="buy-tag">買い</td>
+                <td>$47.12</td><td>+4株（計77株）</td>
+                <td>$57.81</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-01-02</td><td class="buy-tag">買い</td>
+                <td>$46.77</td><td>+4株（計81株）</td>
+                <td>$57.27</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-02-02</td><td class="buy-tag">買い</td>
+                <td>$38.56</td><td>+5株（計86株）</td>
+                <td>$56.18</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-03-02</td><td class="buy-tag">買い</td>
+                <td>$38.34</td><td>+6株（計92株）</td>
+                <td>$55.02</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-04-01</td><td class="buy-tag">買い</td>
+                <td>$27.79</td><td>+7株（計99株）</td>
+                <td>$53.09</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-05-01</td><td class="buy-tag">買い</td>
+                <td>$46.20</td><td>+4株（計103株）</td>
+                <td>$52.82</td><td>-</td></tr><tr class="sell-row">
+                <td>2026-05-21</td><td class="sell-tag">売り</td>
+                <td>$60.75</td><td>-103株</td>
+                <td>$52.82</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2026-06-01</td><td class="buy-tag">買い</td>
+                <td>$69.28</td><td>+93株（計93株）</td>
+                <td>$69.28</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-07-01</td><td class="buy-tag">買い</td>
+                <td>$51.40</td><td>+4株（計97株）</td>
+                <td>$68.54</td><td>-</td></tr><tr class="buy-row">
+                <td>2026-08-03</td><td class="buy-tag">買い</td>
+                <td>$38.85</td><td>+6株（計103株）</td>
+                <td>$66.81</td><td>-</td></tr></tbody></table></div>
+
+<h3>案D（段階的ナンピン -10/-20/-30%）：リターン +1.7%</h3>
+<p style="font-size:11px;color:var(--sub);margin-bottom:6px">-10%で50%投入→-20%で残り50%投入→-30%で残全額投入。キャッシュを温存して深い下落に備える。</p>
+<div class="table-wrap"><table>
+    <thead><tr><th>日付</th><th>種別</th><th>価格</th><th>株数</th><th>平均取得単価</th><th>損益</th></tr></thead>
+    <tbody><tr class="buy-row">
+                <td>2024-12-31</td><td class="buy-tag">買い</td>
+                <td>$41.77</td><td>+2株（計2株）</td>
+                <td>$41.77</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-01-06</td><td class="sell-tag">売り</td>
+                <td>$48.04</td><td>-2株</td>
+                <td>$41.77</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-01-08</td><td class="buy-tag">買い</td>
+                <td>$30.25</td><td>+6株（計6株）</td>
+                <td>$30.25</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-01-10</td><td class="buy-tag">買い</td>
+                <td>$32.33</td><td>+3株（計9株）</td>
+                <td>$30.94</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-01-13</td><td class="buy-tag">買い</td>
+                <td>$27.86</td><td>+4株（計13株）</td>
+                <td>$29.99</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-01-15</td><td class="sell-tag">売り</td>
+                <td>$34.49</td><td>-13株</td>
+                <td>$29.99</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-01-16</td><td class="buy-tag">買い</td>
+                <td>$41.55</td><td>+5株（計5株）</td>
+                <td>$41.55</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-01-17</td><td class="buy-tag">買い</td>
+                <td>$38.89</td><td>+3株（計8株）</td>
+                <td>$40.55</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-02-27</td><td class="buy-tag">買い</td>
+                <td>$24.91</td><td>+13株（計21株）</td>
+                <td>$30.87</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-05-20</td><td class="sell-tag">売り</td>
+                <td>$35.50</td><td>-21株</td>
+                <td>$30.87</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-05-29</td><td class="buy-tag">買い</td>
+                <td>$43.20</td><td>+15株（計15株）</td>
+                <td>$43.20</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-06-05</td><td class="buy-tag">買い</td>
+                <td>$36.66</td><td>+12株（計27株）</td>
+                <td>$40.29</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-07-07</td><td class="sell-tag">売り</td>
+                <td>$46.34</td><td>-27株</td>
+                <td>$40.29</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-07-29</td><td class="buy-tag">買い</td>
+                <td>$40.53</td><td>+23株（計23株）</td>
+                <td>$40.53</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-08-11</td><td class="sell-tag">売り</td>
+                <td>$46.61</td><td>-23株</td>
+                <td>$40.53</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-08-13</td><td class="buy-tag">買い</td>
+                <td>$41.21</td><td>+27株（計27株）</td>
+                <td>$41.21</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-09-12</td><td class="sell-tag">売り</td>
+                <td>$47.39</td><td>-27株</td>
+                <td>$41.21</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-09-26</td><td class="buy-tag">買い</td>
+                <td>$67.28</td><td>+19株（計19株）</td>
+                <td>$67.28</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-10-06</td><td class="sell-tag">売り</td>
+                <td>$77.37</td><td>-19株</td>
+                <td>$67.28</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-10-10</td><td class="buy-tag">買い</td>
+                <td>$70.65</td><td>+21株（計21株）</td>
+                <td>$70.65</td><td>-</td></tr><tr class="sell-row">
+                <td>2025-10-13</td><td class="sell-tag">売り</td>
+                <td>$81.25</td><td>-21株</td>
+                <td>$70.65</td>
+                <td class="pos">+15.0%</td></tr><tr class="buy-row">
+                <td>2025-10-15</td><td class="buy-tag">買い</td>
+                <td>$72.41</td><td>+22株（計22株）</td>
+                <td>$72.41</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-10-16</td><td class="buy-tag">買い</td>
+                <td>$65.59</td><td>+12株（計34株）</td>
+                <td>$70.00</td><td>-</td></tr><tr class="buy-row">
+                <td>2025-10-22</td><td class="buy-tag">買い</td>
+                <td>$55.45</td><td>+15株（計49株）</td>
+                <td>$65.55</td><td>-</td></tr></tbody></table></div>
+
+<!-- ── 3. ローリング分析 ── -->
+<h2>3. ローリング開始日分析（各月スタートでの比較）</h2>
+<p style="font-size:11px;color:var(--sub);margin-bottom:8px">
+  各月から現在までの期間で各戦略を実行したリターン。「最良」列は各月で最も高いリターンの戦略名。<br>
+  DCA買持ちより高い戦略：
+  ベース <span class="win-badge">10/21月（48%）</span>
+  A <span class="win-badge">21/21月（100%）</span>
+  B-15 <span class="win-badge">21/21月（100%）</span>
+  B-20 <span class="win-badge">21/21月（100%）</span>
+  C <span class="win-badge">7/21月（33%）</span>
+  D <span class="win-badge">9/21月（43%）</span>
+</p>
+<div class="table-wrap"><table>
+<thead><tr><th>開始月</th><th>開始株価</th><th>DCA買持ち</th><th>ベース</th><th>案A</th><th>案B-15</th><th>案B-20</th><th>案C</th><th>案D</th><th>最良</th></tr></thead>
+<tbody><tr>
+            <td>2024-11</td>
+            <td>$32.06</td>
+            <td class="pos">+7.3%</td>
+            <td class="neg">-2.2%</td>
+            <td class="pos">+25.5%</td>
+            <td class="pos">+22.2%</td>
+            <td class="pos">+21.0%</td>
+            <td class="pos">+11.7%</td>
+            <td class="pos">+1.7%</td>
+            <td style="color:var(--warn);font-weight:bold">A</td>
+        </tr><tr>
+            <td>2024-12</td>
+            <td>$32.06</td>
+            <td class="pos">+7.3%</td>
+            <td class="neg">-2.2%</td>
+            <td class="pos">+25.5%</td>
+            <td class="pos">+22.2%</td>
+            <td class="pos">+21.0%</td>
+            <td class="pos">+11.7%</td>
+            <td class="pos">+1.7%</td>
+            <td style="color:var(--warn);font-weight:bold">A</td>
+        </tr><tr>
+            <td>2025-01</td>
+            <td>$43.10</td>
+            <td class="pos">+5.8%</td>
+            <td class="neg">-5.4%</td>
+            <td class="pos">+18.7%</td>
+            <td class="pos">+16.8%</td>
+            <td class="pos">+15.6%</td>
+            <td class="pos">+6.2%</td>
+            <td class="neg">-1.0%</td>
+            <td style="color:var(--warn);font-weight:bold">A</td>
+        </tr><tr>
+            <td>2025-02</td>
+            <td>$41.47</td>
+            <td class="pos">+6.6%</td>
+            <td class="neg">-2.9%</td>
+            <td class="pos">+18.8%</td>
+            <td class="pos">+15.7%</td>
+            <td class="pos">+14.7%</td>
+            <td class="pos">+7.3%</td>
+            <td class="pos">+0.6%</td>
+            <td style="color:var(--warn);font-weight:bold">A</td>
+        </tr><tr>
+            <td>2025-03</td>
+            <td>$23.11</td>
+            <td class="pos">+7.5%</td>
+            <td class="neg">-5.0%</td>
+            <td class="pos">+14.0%</td>
+            <td class="pos">+23.7%</td>
+            <td class="pos">+9.0%</td>
+            <td class="pos">+5.2%</td>
+            <td class="neg">-2.2%</td>
+            <td style="color:var(--warn);font-weight:bold">B-15</td>
+        </tr><tr>
+            <td>2025-04</td>
+            <td>$23.19</td>
+            <td class="pos">+3.1%</td>
+            <td class="neg">-6.3%</td>
+            <td class="pos">+10.1%</td>
+            <td class="pos">+18.6%</td>
+            <td class="pos">+6.0%</td>
+            <td class="neg">-0.5%</td>
+            <td class="neg">-3.8%</td>
+            <td style="color:var(--warn);font-weight:bold">B-15</td>
+        </tr><tr>
+            <td>2025-05</td>
+            <td>$27.38</td>
+            <td class="neg">-1.8%</td>
+            <td class="neg">-5.8%</td>
+            <td class="pos">+13.2%</td>
+            <td class="pos">+14.8%</td>
+            <td class="pos">+4.0%</td>
+            <td class="neg">-5.2%</td>
+            <td class="neg">-4.1%</td>
+            <td style="color:var(--warn);font-weight:bold">B-15</td>
+        </tr><tr>
+            <td>2025-06</td>
+            <td>$40.57</td>
+            <td class="neg">-5.9%</td>
+            <td class="neg">-1.9%</td>
+            <td class="pos">+10.0%</td>
+            <td class="pos">+8.0%</td>
+            <td class="pos">+7.9%</td>
+            <td class="neg">-8.5%</td>
+            <td class="neg">-5.1%</td>
+            <td style="color:var(--warn);font-weight:bold">A</td>
+        </tr><tr>
+            <td>2025-07</td>
+            <td>$40.10</td>
+            <td class="neg">-5.7%</td>
+            <td class="neg">-2.8%</td>
+            <td class="pos">+19.0%</td>
+            <td class="pos">+16.0%</td>
+            <td class="pos">+15.9%</td>
+            <td class="neg">-15.0%</td>
+            <td class="neg">-4.4%</td>
+            <td style="color:var(--warn);font-weight:bold">A</td>
+        </tr><tr>
+            <td>2025-08</td>
+            <td>$38.12</td>
+            <td class="neg">-5.5%</td>
+            <td class="neg">-4.7%</td>
+            <td class="pos">+10.5%</td>
+            <td class="pos">+9.5%</td>
+            <td class="pos">+9.5%</td>
+            <td class="neg">-15.3%</td>
+            <td class="neg">-4.8%</td>
+            <td style="color:var(--warn);font-weight:bold">A</td>
+        </tr><tr>
+            <td>2025-09</td>
+            <td>$42.99</td>
+            <td class="neg">-7.1%</td>
+            <td class="neg">-2.9%</td>
+            <td class="pos">+7.6%</td>
+            <td class="pos">+7.4%</td>
+            <td class="pos">+7.4%</td>
+            <td class="neg">-17.7%</td>
+            <td class="neg">-3.5%</td>
+            <td style="color:var(--warn);font-weight:bold">A</td>
+        </tr><tr>
+            <td>2025-10</td>
+            <td>$63.09</td>
+            <td class="neg">-6.9%</td>
+            <td class="neg">-15.2%</td>
+            <td class="pos">+12.1%</td>
+            <td class="pos">+13.0%</td>
+            <td class="pos">+13.1%</td>
+            <td class="neg">-12.4%</td>
+            <td class="neg">-11.3%</td>
+            <td style="color:var(--warn);font-weight:bold">B-20</td>
+        </tr><tr>
+            <td>2025-11</td>
+            <td>$58.40</td>
+            <td class="neg">-4.4%</td>
+            <td class="neg">-10.9%</td>
+            <td class="pos">+14.2%</td>
+            <td class="pos">+15.1%</td>
+            <td class="pos">+15.5%</td>
+            <td class="neg">-12.6%</td>
+            <td class="pos">+2.9%</td>
+            <td style="color:var(--warn);font-weight:bold">B-20</td>
+        </tr><tr>
+            <td>2025-12</td>
+            <td>$47.12</td>
+            <td class="neg">-1.4%</td>
+            <td class="neg">-2.8%</td>
+            <td class="pos">+14.2%</td>
+            <td class="pos">+13.0%</td>
+            <td class="pos">+12.9%</td>
+            <td class="neg">-8.1%</td>
+            <td class="pos">+0.3%</td>
+            <td style="color:var(--warn);font-weight:bold">A</td>
+        </tr><tr>
+            <td>2026-01</td>
+            <td>$46.77</td>
+            <td class="neg">-0.4%</td>
+            <td class="pos">+1.8%</td>
+            <td class="pos">+8.5%</td>
+            <td class="pos">+14.2%</td>
+            <td class="pos">+14.2%</td>
+            <td class="neg">-12.9%</td>
+            <td class="neg">-1.7%</td>
+            <td style="color:var(--warn);font-weight:bold">B-15</td>
+        </tr><tr>
+            <td>2026-02</td>
+            <td>$38.56</td>
+            <td class="pos">+0.8%</td>
+            <td class="pos">+3.4%</td>
+            <td class="pos">+6.4%</td>
+            <td class="pos">+8.2%</td>
+            <td class="pos">+8.2%</td>
+            <td class="neg">-12.1%</td>
+            <td class="neg">-3.0%</td>
+            <td style="color:var(--warn);font-weight:bold">B-15</td>
+        </tr><tr>
+            <td>2026-03</td>
+            <td>$38.34</td>
+            <td class="neg">-1.4%</td>
+            <td class="pos">+0.4%</td>
+            <td class="pos">+2.9%</td>
+            <td class="pos">+3.3%</td>
+            <td class="pos">+3.3%</td>
+            <td class="neg">-11.5%</td>
+            <td class="neg">-4.3%</td>
+            <td style="color:var(--warn);font-weight:bold">B-15</td>
+        </tr><tr>
+            <td>2026-04</td>
+            <td>$27.79</td>
+            <td class="neg">-4.4%</td>
+            <td class="neg">-5.1%</td>
+            <td class="neg">-3.8%</td>
+            <td class="neg">-1.7%</td>
+            <td class="neg">-1.7%</td>
+            <td class="neg">-12.1%</td>
+            <td class="neg">-5.9%</td>
+            <td style="color:var(--warn);font-weight:bold">B-15</td>
+        </tr><tr>
+            <td>2026-05</td>
+            <td>$46.20</td>
+            <td class="neg">-20.3%</td>
+            <td class="neg">-9.9%</td>
+            <td class="neg">-7.9%</td>
+            <td class="neg">-5.6%</td>
+            <td class="neg">-5.6%</td>
+            <td class="neg">-13.2%</td>
+            <td class="neg">-8.0%</td>
+            <td style="color:var(--warn);font-weight:bold">B-15</td>
+        </tr><tr>
+            <td>2026-06</td>
+            <td>$69.28</td>
+            <td class="neg">-24.1%</td>
+            <td class="neg">-4.2%</td>
+            <td class="neg">-0.3%</td>
+            <td class="pos">+1.5%</td>
+            <td class="neg">-2.0%</td>
+            <td class="neg">-8.0%</td>
+            <td class="pos">+5.1%</td>
+            <td style="color:var(--warn);font-weight:bold">D</td>
+        </tr><tr>
+            <td>2026-07</td>
+            <td>$51.40</td>
+            <td class="neg">-9.0%</td>
+            <td class="pos">+23.2%</td>
+            <td class="pos">+23.2%</td>
+            <td class="pos">+23.2%</td>
+            <td class="pos">+23.2%</td>
+            <td class="pos">+4.7%</td>
+            <td class="pos">+12.4%</td>
+            <td style="color:var(--warn);font-weight:bold">ベース</td>
+        </tr></tbody>
+</table></div>
+
+<!-- ── 4. 考察 ── -->
+<h2>4. 考察と推奨事項</h2>
+<div class="insight">
+  <strong>月次資金の最適な使い方（全期間ベース）</strong><br>
+  全期間で最も高いリターンを示したのは「案A：シグナル再発生ナンピン」（+25.5%）。
+  ただしローリング分析の結果（各月での勝率）も合わせて判断することが重要。
+</div>
+<div class="insight">
+  <strong>ナンピンの効果について</strong><br>
+  IONQのような高ボラ銘柄では、下落後に大きく反発するケースが多い。
+  ナンピン買いで平均取得単価を下げることで、売りシグナル（+15%）への到達が早くなり、
+  回転数（売買サイクル）が増える効果がある。<br>
+  一方で、下落が継続する局面では損失が拡大するリスクも同時に高まる。
+</div>
+<div class="warn-box">
+  <strong>注意：ナンピンのリスク</strong><br>
+  ・IONQが長期低迷した場合、ナンピンで買い増すほど損失総額が大きくなる<br>
+  ・月次資金が少ない（$200/月）ため、1回の追加購入で買えるのは数株程度<br>
+  ・ナンピン後に売りシグナルが遠のく（平均コスト変化）ことで、保有期間が延びる場合がある
+</div>
+<div class="insight">
+  <strong>実運用での推奨</strong><br>
+  1. 毎月のお金は「現金として温存」し、-10%シグナルが出たときだけ投入（案A相当）<br>
+  2. 含み損が-20%を超えた場合のみ、追加で投入を検討（案B-20）<br>
+  3. 急落相場でなければ、無理にナンピンせず現金を蓄積して次のシグナルを待つのが無難
+</div>
+
+</div>
+</body>
+</html>
