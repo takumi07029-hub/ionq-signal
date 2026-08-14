@@ -9,24 +9,30 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, sans-serif; background: #0f1117; color: #e0e0e0;
     padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); }
-  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
-  .back-btn { background: none; border: none; color: #6699ff; font-size: 16px;
-    cursor: pointer; padding: 4px 0; text-decoration: none; }
+  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .back-btn { color: #6699ff; font-size: 16px; text-decoration: none; }
   h1 { font-size: 18px; color: #fff; }
-  .report-card { background: #1e2130; border-radius: 12px; padding: 16px 20px;
-    margin-bottom: 12px; text-decoration: none; display: block;
-    border: 1px solid #2a2d3a; transition: border-color 0.2s; }
+  h2 { font-size: 12px; color: #555; margin: 18px 0 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .report-card { background: #1e2130; border-radius: 12px; padding: 14px 16px;
+    margin-bottom: 10px; text-decoration: none; display: block;
+    border: 1px solid #2a2d3a; }
   .report-card:active { border-color: #4488ff; background: #1a2238; }
-  .report-title { font-size: 15px; color: #fff; font-weight: bold; margin-bottom: 4px; }
+  .report-card.featured { border-color: #a78bfa; }
+  .report-title { font-size: 14px; color: #fff; font-weight: bold; margin-bottom: 3px; }
   .report-desc { font-size: 12px; color: #888; line-height: 1.6; }
-  .report-date { font-size: 11px; color: #555; margin-top: 6px; }
-  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px;
-    font-weight: bold; margin-right: 6px; margin-bottom: 6px; }
-  .tag-main { background: rgba(96,165,250,0.15); color: #60a5fa; }
-  .tag-new  { background: rgba(167,139,250,0.15); color: #a78bfa; }
-  .tag-ref  { background: rgba(148,163,184,0.15); color: #94a3b8; }
-  .notice { background: #1a2238; border-radius: 8px; padding: 12px 14px;
-    font-size: 12px; color: #888; line-height: 1.7; margin-bottom: 20px; }
+  .tag { display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 11px;
+    font-weight: bold; margin-right: 5px; margin-bottom: 5px; }
+  .tag-new    { background: rgba(167,139,250,0.2); color: #a78bfa; }
+  .tag-main   { background: rgba(96,165,250,0.15); color: #60a5fa; }
+  .tag-ref    { background: rgba(148,163,184,0.12); color: #94a3b8; }
+  .tag-green  { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .notice { background: #1a2238; border-left: 3px solid #60a5fa; border-radius: 6px;
+    padding: 10px 14px; font-size: 12px; color: #888; line-height: 1.7; margin-bottom: 16px; }
+  .strategy-summary { background: #1a2e1a; border: 1px solid #2d5a2d; border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 16px; }
+  .strategy-summary .title { font-size: 12px; color: #4ade80; font-weight: bold; margin-bottom: 6px; }
+  .strategy-summary .rule { font-size: 15px; color: #fff; font-weight: bold; margin-bottom: 2px; }
+  .strategy-summary .sub { font-size: 11px; color: #666; }
 </style>
 </head>
 <body>
@@ -34,58 +40,79 @@
 <div class="header">
   <a href="/" class="back-btn">← シグナル画面へ</a>
 </div>
-<h1 style="margin-bottom:8px">IONQ 分析レポート</h1>
+<h1 style="margin-bottom:12px">IONQ 分析レポート</h1>
 
-<div class="notice">
-  ※ 各レポートはPC上で最後に分析を実行した時点のデータです。<br>
-  　 最新データへの更新はPC上で再実行が必要です。
+<div class="strategy-summary">
+  <div class="title">現在の採用戦略</div>
+  <div class="rule">買い：直近20日高値から -15% 下落</div>
+  <div class="sub">= 20日高値 × 0.85 を下回ったら買い注文</div>
+  <div class="rule" style="margin-top:6px">売り：取得平均単価から +15% 上昇（指値）</div>
+  <div class="sub">= 平均取得単価 × 1.15 で指値注文を事前設定</div>
 </div>
 
+<div class="notice">
+  ※ 各レポートはPC上で最後に分析を実行した時点のデータです。最新データへの更新はPC上で再実行が必要です。
+</div>
+
+<h2>戦略解説</h2>
+
+<a href="strategy.html" class="report-card featured">
+  <span class="tag tag-new">必読</span><span class="tag tag-green">戦略解説</span>
+  <div class="report-title">現在の売買戦略 解説ページ</div>
+  <div class="report-desc">
+    なぜ -15%/+15% を採用しているか。変遷の経緯・根拠・注意事項を解説。<br>
+    AI多人数会議（10ラウンド×3回）の結論をまとめたもの。
+  </div>
+</a>
+
+<h2>最新分析レポート</h2>
+
+<a href="10shares.html" class="report-card featured">
+  <span class="tag tag-new">最新</span><span class="tag tag-main">比較分析</span>
+  <div class="report-title">10株スタート 全戦略比較レポート</div>
+  <div class="report-desc">
+    2024年12月に10株を持っていた前提で全戦略を公平比較。<br>
+    主指標は確定損益（含み損益を除く完了した売買の合計）。<br>
+    下落率・RSI・MA・BB・ナンピンを網羅。パラメータマトリクス・ローリング分析収録。
+  </div>
+</a>
+
 <a href="limitorder.html" class="report-card">
-  <span class="tag tag-new">最新</span><span class="tag tag-main">指値売り</span>
+  <span class="tag tag-main">指値売り</span>
   <div class="report-title">指値売り 最適戦略レポート</div>
   <div class="report-desc">
-    実運用（指値注文）を前提とした最適パラメータ分析。<br>
-    日中高値が目標価格に達した日に指値約定する条件でバックテスト。<br>
-    パラメータマトリクス・ローリング分析・全戦略比較・トレード履歴を収録。
+    実運用（指値注文）前提での最適パラメータ分析。パラメータマトリクス・ローリング分析・トレード履歴収録。
   </div>
 </a>
 
-<a href="intraday.html" class="report-card">
-  <span class="tag tag-main">比較</span>
-  <div class="report-title">終値売り vs 指値売り 比較レポート</div>
-  <div class="report-desc">
-    終値売り（従来バックテスト）と指値売り（実運用）の差異を検証。<br>
-    IONQの特性上、指値売りは終値売りより収益率が低くなる理由を解説。
-  </div>
-</a>
+<h2>ナンピン分析</h2>
 
 <a href="nanpin_2024dec.html" class="report-card">
-  <span class="tag tag-new">最新</span><span class="tag tag-main">ナンピン</span>
-  <div class="report-title">ナンピン戦略比較レポート（2024年12月以降）</div>
+  <span class="tag tag-main">ナンピン</span>
+  <div class="report-title">ナンピン戦略比較（2024年12月以降）</div>
   <div class="report-desc">
-    月次資金（$200/月）を活用したナンピン買い戦略の比較。<br>
-    ベース・案A（シグナル再発生）・案B（平均単価基準）・案C（定額積立）・案D（段階的）<br>
-    全戦略のローリング開始日分析・取引履歴を収録。2024年12月以降の株価で検証。
+    月次資金$200を活用した5種類のナンピン戦略比較。ローリング分析付き。
   </div>
 </a>
 
 <a href="nanpin.html" class="report-card">
   <span class="tag tag-ref">参考</span><span class="tag tag-main">ナンピン</span>
-  <div class="report-title">ナンピン戦略比較レポート（全期間）</div>
-  <div class="report-desc">
-    同上の分析を過去3年間の全データで実施したもの。<br>
-    株価が低かった期間（2023〜2024年前半）を含む参考版。
-  </div>
+  <div class="report-title">ナンピン戦略比較（全期間・参考）</div>
+  <div class="report-desc">株価が低かった2023〜2024年前半を含む参考版。</div>
+</a>
+
+<h2>その他・参考レポート</h2>
+
+<a href="intraday.html" class="report-card">
+  <span class="tag tag-ref">参考</span>
+  <div class="report-title">終値売り vs 指値売り 比較</div>
+  <div class="report-desc">なぜ指値売りは終値売りより収益率が低くなるかを解説。</div>
 </a>
 
 <a href="multi.html" class="report-card">
   <span class="tag tag-ref">参考</span>
-  <div class="report-title">複数銘柄 戦略比較レポート</div>
-  <div class="report-desc">
-    IONQ・SPXL・316A（FANG+）・408A（iSベストAI）の4銘柄を対象に<br>
-    下落率・RSI・MAクロス・ボリンジャーバンドの4戦略を比較した総合レポート。
-  </div>
+  <div class="report-title">複数銘柄 戦略比較（IONQ・SPXL・316A・408A）</div>
+  <div class="report-desc">4銘柄×4戦略の総合比較レポート。</div>
 </a>
 
 </body>

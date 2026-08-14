@@ -362,8 +362,8 @@ function renderSignals(closes, dates, holdings) {
   document.getElementById('buy-status').textContent = r.buyAlert
     ? '★ 買いシグナル発生中！追加購入を検討' : '未発生（現金待機）';
   document.getElementById('buy-diff').textContent = r.buyAlert
-    ? '現在株価 $' + r.current.toFixed(2) + ' が発動価格を下回っています'
-    : '直近' + LB + '日高値 $' + r.high20.toFixed(2) + ' × 0.85  /  あと -' + Math.abs(r.buyDiff).toFixed(1) + '% 下落で発生';
+    ? '現在株価 $' + r.current.toFixed(2) + ' が発動価格（-15%）を下回っています'
+    : '直近' + LB + '日高値 $' + r.high20.toFixed(2) + '  -15%  /  あと -' + Math.abs(r.buyDiff).toFixed(1) + '% 下落で発生';
 
   // 保有状況
   var tbl = document.getElementById('holdings-table');

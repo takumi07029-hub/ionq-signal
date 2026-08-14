@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IONQ 売買戦略 解説</title>
+<meta name="theme-color" content="#0f1117">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, sans-serif; background: #0f1117; color: #e0e0e0;
+    padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); line-height: 1.7; }
+  a.back { color: #6699ff; font-size: 14px; text-decoration: none; display: block; margin-bottom: 16px; }
+  h1 { font-size: 18px; color: #fff; margin-bottom: 4px; }
+  .meta { font-size: 11px; color: #555; margin-bottom: 20px; }
+  h2 { font-size: 14px; color: #60a5fa; margin: 24px 0 8px;
+    padding-bottom: 5px; border-bottom: 1px solid #2a2d3a; }
+  h3 { font-size: 13px; color: #94a3b8; margin: 14px 0 6px; }
+  p { font-size: 13px; color: #ccc; margin-bottom: 8px; }
+  .card { background: #1a1d2e; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+  .strategy-box { background: #1a1d2e; border: 2px solid #60a5fa; border-radius: 12px;
+    padding: 16px; margin-bottom: 16px; }
+  .strategy-box .rule { font-size: 18px; font-weight: bold; color: #fff;
+    margin-bottom: 4px; }
+  .strategy-box .sub { font-size: 12px; color: #888; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 8px; }
+  th { background: #1e2238; color: #888; padding: 7px 8px; text-align: center;
+    border: 1px solid #2a2d3a; }
+  td { padding: 6px 8px; border: 1px solid #2a2d3a; text-align: center; }
+  td.left { text-align: left; }
+  .pos { color: #4ade80; font-weight: bold; }
+  .neg { color: #f87171; font-weight: bold; }
+  .warn { color: #fbbf24; }
+  .highlight { background: rgba(167,139,250,0.15); color: #a78bfa; font-weight: bold; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+  .badge-blue { background: rgba(96,165,250,0.15); color: #60a5fa; }
+  .badge-green { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .badge-red { background: rgba(248,113,113,0.15); color: #f87171; }
+  .history-item { border-left: 3px solid #2a2d3a; padding: 4px 10px; margin-bottom: 6px; font-size: 12px; color: #888; }
+  .history-item.current { border-color: #60a5fa; color: #e0e0e0; }
+</style>
+</head>
+<body>
+
+<a href="/reports/" class="back">← レポート一覧へ</a>
+<h1>IONQ 売買戦略 解説</h1>
+<div class="meta">最終更新: 2026年8月 ／ AI多人数会議（10ラウンド×3回）に基づく</div>
+
+<h2>現在の戦略</h2>
+<div class="strategy-box">
+  <div class="rule">買い：直近20日高値から -15% 下落</div>
+  <div class="sub">= 20日高値 × 0.85 を下回ったら買い注文</div>
+  <div class="rule" style="margin-top:10px">売り：取得平均単価から +15% 上昇（指値）</div>
+  <div class="sub">= 平均取得単価 × 1.15 で指値注文を事前設定</div>
+</div>
+
+<h2>なぜこの戦略か</h2>
+
+<div class="card">
+  <h3>1. IONQの値動きの特性に合っている</h3>
+  <p>IONQは量子コンピューター関連の材料株で、急落・急回復を繰り返す。「十分に下がった局面で買い、回復したところで売る」という下落率戦略はこの特性に最も合致する。RSI・MAクロス・ボリンジャーバンドも検証したが、成績が不安定か実運用困難（日中監視が必要）のいずれかだった。</p>
+</div>
+
+<div class="card">
+  <h3>2. 売りは指値注文（日中監視不要）</h3>
+  <p>日中はスマホしか触れないため、売りは楽天証券で指値注文を事前設定しておく。「日中高値が指値目標に達したら約定」という方式で完全にほったらかし運用が可能。</p>
+</div>
+
+<div class="card">
+  <h3>3. 買いトリガーは -15%（-10%ではない理由）</h3>
+  <p>-10%では「普通の値動きの範囲」でもシグナルが出てしまい、高値圏でも買ってしまう。直近の実証として、-10%設定で$72.41（高値圏）でエントリーし、現在$44.98まで下落中（含み損-38%）という事態が発生。</p>
+  <p><span class="warn">-15%は「通常の小さな調整」と「本格的な押し目」の境界として機能する。</span></p>
+
+  <table>
+    <thead><tr><th>設定</th><th>確定損益</th><th>1回平均利益</th><th>最終エントリー</th></tr></thead>
+    <tbody>
+      <tr><td class="left">-10%（旧設定）</td><td class="pos">+$452</td><td>$65/回</td><td class="neg">$72.41（高値）</td></tr>
+      <tr class="highlight"><td class="left">-15%（現在）</td><td class="pos">+$481</td><td>$69/回</td><td>$65.59</td></tr>
+      <tr><td class="left">-30%（参考）</td><td class="pos">+$547</td><td>$137/回</td><td>$49.31（安値）</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:11px;color:#555">※ 2024年12月以降・10株スタートの確定損益ベース</p>
+</div>
+
+<div class="card">
+  <h3>4. 売り目標 +15% の根拠</h3>
+  <p>売り目標を+20%・+25%に上げても、取引回数が減ることで確定損益の合計はほとんど変わらない（-10%/+15%の$452 対 -10%/+20%の$431）。シンプルさと取引頻度のバランスで+15%を維持。</p>
+</div>
+
+<h2>戦略の変遷</h2>
+
+<div class="history-item">
+  <strong>2023年〜2024年</strong>：-15%/+15%（終値売り）でバックテスト開始。過去3年データで+480%超の実績確認。
+</div>
+<div class="history-item">
+  <strong>2026年5月</strong>：-15%/+15%（指値売り）で正式採用。アプリ（ionq-signal.vercel.app）を構築。
+</div>
+<div class="history-item">
+  <strong>途中</strong>：-10%/+15%に変更（短期データでの分析が根拠）。
+</div>
+<div class="history-item current">
+  <strong>2026年8月（現在）</strong>：AI多人数会議（10ラウンド×3回）の結果、<strong>-15%/+15%に回帰</strong>。<br>
+  根拠：確定損益分析・実保有での高値掴み実証・統計的な有意性の検討。
+</div>
+
+<h2>主要な検証結果（2024年12月以降）</h2>
+
+<table>
+  <thead><tr><th>戦略</th><th>確定損益</th><th>取引数</th><th>1回平均</th></tr></thead>
+  <tbody>
+    <tr><td class="left">DR -30/+30（最高利益）</td><td class="pos">+$547</td><td>4回</td><td>$137</td></tr>
+    <tr class="highlight"><td class="left">DR -15/+15（採用）</td><td class="pos">+$481</td><td>7回</td><td>$69</td></tr>
+    <tr><td class="left">DR -10/+15（旧）</td><td class="pos">+$452</td><td>7回</td><td>$65</td></tr>
+    <tr><td class="left">DR -10/+20</td><td class="pos">+$431</td><td>5回</td><td>$86</td></tr>
+    <tr><td class="left">BB(20,2.0) 指値</td><td class="pos">+$391</td><td>8回</td><td>$49</td></tr>
+    <tr><td class="left">MA 5/20（最悪）</td><td class="pos">+$32</td><td>12回</td><td>$3</td></tr>
+    <tr><td class="left">BH（買持ち・未実現）</td><td>+$129</td><td>-</td><td>-</td></tr>
+  </tbody>
+</table>
+
+<p style="font-size:11px;color:#555;margin-top:4px">
+  ※ 確定損益のみ（含み損益を除く）。初期条件：2024年12月に10株(@$32.06)保有。<br>
+  ※ -30%/+30%は利益最大だがシグナルが稀（20ヶ月で4回）。月次資金との相性や待機期間を考慮し-15%を採用。<br>
+  ※ 20ヶ月・4〜12回という少ない取引数のため、戦略間の差に絶対的な統計的有意性はない。
+</p>
+
+<h2>注意事項</h2>
+<div class="card">
+  <p>• バックテストは過去データによる検証であり、将来の利益を保証しない</p>
+  <p>• 現在保有中ポジションの含み損はIONQ株価の下落に起因する市場リスク。戦略自体の問題ではない</p>
+  <p>• 6ヶ月ごとに戦略の有効性を再検証する（次回：2027年2月）</p>
+</div>
+
+</body>
+</html>
